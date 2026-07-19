@@ -9,6 +9,15 @@ const paletteSource = readFileSync(new URL("../src/components/PaletteWizard.tsx"
 const tabsSource = readFileSync(new URL("../src/components/ui/tabs.tsx", import.meta.url), "utf8")
 const customizerCssSource = readFileSync(new URL("../src/theme-customizer.css", import.meta.url), "utf8")
 const paletteCssSource = readFileSync(new URL("../src/palette-wizard.css", import.meta.url), "utf8")
+const buttonSource = readFileSync(new URL("../src/components/ui/button.tsx", import.meta.url), "utf8")
+const extendedGallerySource = readFileSync(new URL("../src/components/ExtendedGallery.tsx", import.meta.url), "utf8")
+const variantsSource = readFileSync(new URL("../src/variants.ts", import.meta.url), "utf8")
+const comparisonSource = readFileSync(new URL("../src/components/ComparisonWorkspace.tsx", import.meta.url), "utf8")
+const exportSource = readFileSync(new URL("../src/export-project.ts", import.meta.url), "utf8")
+const themeSource = readFileSync(new URL("../src/theme.ts", import.meta.url), "utf8")
+const structuralSource = readFileSync(new URL("../src/components/StructuralStyleDemo.tsx", import.meta.url), "utf8")
+const baseCssSource = readFileSync(new URL("../src/styles.css", import.meta.url), "utf8")
+const overrideCssSource = readFileSync(new URL("../src/customization-overrides.css", import.meta.url), "utf8")
 
 const definedPresetIds = [...presetsSource.matchAll(/preset\("([a-z0-9-]+)"/g)].map((match) => match[1])
 const curatedBlock = presetsSource.match(/CURATED_STYLE_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/)
@@ -70,6 +79,60 @@ const requiredGlobalGuards = [
 for (const guard of requiredGlobalGuards) if (!curatedCssSource.includes(guard)) fail(`missing responsive/accessibility guard: ${guard}`)
 if (recipeCssSource.includes("> :is(aside,main)")) fail("decorative backdrop must not pull the fixed sidebar back into document flow")
 if (appSource.includes("<span>UI</span>")) fail("sidebar brand must not restore the removed UI tile")
+if (!appSource.includes('<aside className="library-sidebar">') || !baseCssSource.includes(".library-sidebar{width:248px")) {
+  fail("the workbench rail must use its dedicated library-sidebar contract")
+}
+if (/(^|[},])aside\{/.test(baseCssSource)) fail("generic aside rules must not capture structural inspectors or exports")
+
+if (!buttonSource.includes('`button-size-${size}`') || buttonSource.includes('`button-${size}`')) {
+  fail("button size classes must remain namespaced away from visual variants")
+}
+if (!buttonSource.includes('type = "button"')) fail("the Button primitive must not submit forms by default")
+if (/button-(?:outline|ghost|destructive) button-default/.test(extendedGallerySource)) {
+  fail("manual button classes reintroduce the default variant/size collision")
+}
+for (const size of ["sm", "default", "lg"]) {
+  if (!overrideCssSource.includes(`.button-size-${size}`)) fail(`missing token-aware ${size} button sizing`)
+}
+if (!recipeCssSource.includes('.spec-section > :not(.section-heading) { grid-column: 2;')) {
+  fail("two-column recipes must pin every specimen to the content rail")
+}
+if (/(^|[},])header\{/.test(baseCssSource) || /\] header\s*\{/.test(recipeCssSource)) {
+  fail("page-level header recipes must be scoped to .page-hero")
+}
+if (baseCssSource.includes("overflow-x:clip")) fail("horizontal overflow must not be hidden with clipping")
+if (appSource.indexOf('import "./customization-overrides.css"') < appSource.indexOf('import "./curated-styles.css"')) {
+  fail("the explicit customization contract must load after curated preset CSS")
+}
+
+for (const contract of ["previewMode: ThemeMode", "VARIANTS_VERSION = 2", "LEGACY_VARIANTS_STORAGE_KEY", "preferredThemeMode(config.preset)"]) {
+  if (!variantsSource.includes(contract)) fail(`saved variants are missing mode migration contract: ${contract}`)
+}
+if (comparisonSource.includes("mode: ThemeMode") || !comparisonSource.includes("variant.previewMode")) {
+  fail("comparison previews must render each saved variant in its own mode")
+}
+if (!comparisonSource.includes("createPortal") || !comparisonSource.includes('event.key !== "Tab"')) {
+  fail("comparison workspace must portal and trap focus")
+}
+if (exportSource.includes('<div className="app theme-scope"') || !exportSource.includes("exported-theme-scope")) {
+  fail("exported pages must not inherit the workbench sidebar offset")
+}
+for (const contract of ['import("jszip")', "generateStructuralDemoSource", 'path: "src/components/StructuralStyleDemo.tsx"', 'path: "src/structural-style-demo.css"']) {
+  if (!exportSource.includes(contract)) fail(`export bundle is missing its runtime/structural contract: ${contract}`)
+}
+for (const duplicateRole of ["--control-height: calc", "--surface-padding: var(--space-6)", "--layout-gap: var(--space-6)"]) {
+  if (exportSource.includes(duplicateRole)) fail(`export must not overwrite density-aware role token ${duplicateRole}`)
+}
+for (const contract of ["candidates = [\"#ffffff\", \"#000000\"]", "accessibleFocusRing", "focusRing: accessibleFocusRing"]) {
+  if (!themeSource.includes(contract)) fail(`theme accessibility contract missing: ${contract}`)
+}
+for (const style of ["cinematic-mission-control", "canvas", "node-based", "split-pane-workspace"]) {
+  if (!structuralSource.includes(`style === "${style}"`)) fail(`missing real structural demo for ${style}`)
+}
+for (const interaction of ["setPointerCapture", "role=\"separator\"", "<svg", "Surviving path"]) {
+  if (!structuralSource.includes(interaction)) fail(`structural demos are missing interaction contract: ${interaction}`)
+}
+if (!appSource.includes('>Save as new</Button>')) fail("saved directions need an explicit Save as new path")
 
 const requiredCustomizerContracts = [
   [appSource, "</header>\n      <ThemeCustomizer", "customizer must remain the first workspace section after the hero"],
