@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Check, Copy, Lock, Shuffle, Unlock } from "lucide-react"
 import {
   bestContrastingColor,
@@ -57,6 +57,10 @@ function currentPalette(config: ThemeConfig): Palette {
   }
 }
 
+function paletteSignature(palette: Palette): string {
+  return fields.map(({ key }) => palette[key]).join(":")
+}
+
 function randomByte(): number {
   if (typeof crypto !== "undefined" && crypto.getRandomValues) return crypto.getRandomValues(new Uint8Array(1))[0]
   return Math.floor(Math.random() * 256)
@@ -92,9 +96,18 @@ function buildTheme(config: ThemeConfig, colors: Palette): ThemeConfig {
 }
 
 export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
-  const initial = currentPalette(config)
-  const [selected, setSelected] = useState<Palette>(initial)
-  const [drafts, setDrafts] = useState<Record<keyof Palette, string>>(initial)
+  const incomingPalette = useMemo(() => currentPalette(config), [
+    config.light.primary,
+    config.light.secondary,
+    config.light.background,
+    config.light.surface,
+    config.light.foreground,
+  ])
+  const incomingSignature = paletteSignature(incomingPalette)
+  const previousIncomingSignature = useRef(incomingSignature)
+  const lastAppliedSignature = useRef<string | null>(null)
+  const [selected, setSelected] = useState<Palette>(incomingPalette)
+  const [drafts, setDrafts] = useState<Record<keyof Palette, string>>(incomingPalette)
   const [locked, setLocked] = useState(emptyLocks)
   const [status, setStatus] = useState("")
 
@@ -104,29 +117,31 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
     { label: "Primary action", ratio: getContrastRatio(bestContrastingColor(selected.primary), selected.primary) },
   ], [selected])
 
-  const setPalette = useCallback((palette: Palette) => {
+  const setPalette = (palette: Palette) => {
     setSelected(palette)
     setDrafts(palette)
     setStatus("")
-  }, [])
+  }
 
-  const randomize = useCallback(() => {
+  const randomize = () => {
     const next = { ...selected }
     for (const { key } of fields) if (!locked[key]) next[key] = randomColor()
     setPalette(next)
-  }, [locked, selected, setPalette])
+  }
 
   useEffect(() => {
-    const shuffleOnSpace = (event: KeyboardEvent) => {
-      if (event.code !== "Space" || event.repeat) return
-      const target = event.target
-      if (target instanceof HTMLElement && target.closest("input, textarea, select, button, a, [contenteditable='true']")) return
-      event.preventDefault()
-      randomize()
+    if (previousIncomingSignature.current === incomingSignature) return
+    previousIncomingSignature.current = incomingSignature
+    if (lastAppliedSignature.current === incomingSignature) {
+      lastAppliedSignature.current = null
+      return
     }
-    window.addEventListener("keydown", shuffleOnSpace)
-    return () => window.removeEventListener("keydown", shuffleOnSpace)
-  }, [randomize])
+    lastAppliedSignature.current = null
+    setSelected(incomingPalette)
+    setDrafts(incomingPalette)
+    setLocked(emptyLocks())
+    setStatus("")
+  }, [incomingPalette, incomingSignature])
 
   const updateHexDraft = (key: keyof Palette, value: string) => {
     setDrafts((current) => ({ ...current, [key]: value }))
@@ -152,7 +167,9 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
   }
 
   const apply = () => {
-    onChange(buildTheme(config, selected))
+    const nextConfig = buildTheme(config, selected)
+    lastAppliedSignature.current = paletteSignature(currentPalette(nextConfig))
+    onChange(nextConfig)
     setStatus("Palette applied across the gallery")
   }
 
@@ -162,21 +179,21 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
         <div>
           <p className="palette-wizard__eyebrow">Five-colour generator</p>
           <h2 id="palette-wizard-title">Find your palette</h2>
-          <p>Lock the colours you love, then shuffle the rest. Press <kbd>Space</kbd> for a new mix.</p>
+          <p>Lock the colours you love, then shuffle. Applying builds coordinated light and dark modes.</p>
         </div>
       </div>
 
-      <div className="palette-wizard__toolbar">
-        <button className="palette-wizard__shuffle" type="button" onClick={randomize}>
-          <Shuffle size={16} aria-hidden="true" /> Randomize unlocked
+      <div className="palette-wizard__toolbar" role="group" aria-label="Palette generator actions">
+        <button className="palette-wizard__shuffle" type="button" aria-label="Randomize unlocked colours" onClick={randomize}>
+          <Shuffle size={16} aria-hidden="true" /> Randomize
         </button>
-        <button type="button" onClick={() => setPalette(EXAMPLE_PALETTE)}>Try warm example</button>
+        <button type="button" aria-label="Try warm example" onClick={() => setPalette(EXAMPLE_PALETTE)}>Warm</button>
         <button type="button" onClick={copyPalette} aria-label="Copy all five hex colours">
           <Copy size={16} aria-hidden="true" /> Copy
         </button>
       </div>
 
-      <div className="palette-wizard__strip" aria-label="Five-colour palette">
+      <div className="palette-wizard__strip" role="group" aria-label="Five-colour palette">
         {fields.map(({ key, label, hint }) => {
           const valid = normalizeHex(drafts[key]) !== null
           return (
@@ -215,7 +232,9 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
         })}
       </div>
 
-      <div className="palette-wizard__contrast" aria-label="Contrast summary">
+      <button className="palette-wizard__apply" type="button" onClick={apply}>Apply palette</button>
+
+      <div className="palette-wizard__contrast" role="group" aria-label="Contrast summary">
         {checks.map((check) => (
           <div key={check.label}>
             <span>{check.label}</span>
@@ -226,8 +245,6 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
           </div>
         ))}
       </div>
-
-      <button className="palette-wizard__apply" type="button" onClick={apply}>Apply palette</button>
       <p className="palette-wizard__status" aria-live="polite">{status}</p>
     </section>
   )

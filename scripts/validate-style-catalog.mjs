@@ -4,6 +4,11 @@ const presetsSource = readFileSync(new URL("../src/presets.ts", import.meta.url)
 const recipeCssSource = readFileSync(new URL("../src/authentic-styles.css", import.meta.url), "utf8")
 const curatedCssSource = readFileSync(new URL("../src/curated-styles.css", import.meta.url), "utf8")
 const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8")
+const customizerSource = readFileSync(new URL("../src/components/ThemeCustomizer.tsx", import.meta.url), "utf8")
+const paletteSource = readFileSync(new URL("../src/components/PaletteWizard.tsx", import.meta.url), "utf8")
+const tabsSource = readFileSync(new URL("../src/components/ui/tabs.tsx", import.meta.url), "utf8")
+const customizerCssSource = readFileSync(new URL("../src/theme-customizer.css", import.meta.url), "utf8")
+const paletteCssSource = readFileSync(new URL("../src/palette-wizard.css", import.meta.url), "utf8")
 
 const definedPresetIds = [...presetsSource.matchAll(/preset\("([a-z0-9-]+)"/g)].map((match) => match[1])
 const curatedBlock = presetsSource.match(/CURATED_STYLE_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/)
@@ -66,6 +71,23 @@ for (const guard of requiredGlobalGuards) if (!curatedCssSource.includes(guard))
 if (recipeCssSource.includes("> :is(aside,main)")) fail("decorative backdrop must not pull the fixed sidebar back into document flow")
 if (appSource.includes("<span>UI</span>")) fail("sidebar brand must not restore the removed UI tile")
 
+const requiredCustomizerContracts = [
+  [appSource, "</header>\n      <ThemeCustomizer", "customizer must remain the first workspace section after the hero"],
+  [customizerSource, '<div id="customize" className="customizer-inline" role="region"', "customizer shell must be a labeled region"],
+  [customizerSource, '<div className="customizer-inline-header">', "customizer heading must not inherit broad header recipes"],
+  [customizerSource, 'export type CustomizerPanel = "styles" | "colors" | "type" | "layout" | "tokens"', "customizer must expose all five control panels"],
+  [paletteSource, "const previousIncomingSignature = useRef(incomingSignature)", "palette must refresh after external theme changes"],
+  [paletteSource, "lastAppliedSignature.current = paletteSignature", "palette Apply must preserve local locks and status"],
+  [customizerCssSource, ".customizer-inline :is(.style-selector__grid,.font-selector__grid) { max-height: none; overflow: visible;", "inline selectors must use the document as their scroll owner"],
+  [paletteCssSource, "grid-auto-columns: minmax(132px, 42%);", "zoomed palettes must keep usable swatch widths"],
+  [paletteSource, 'role="group" aria-label="Palette generator actions"', "palette actions need an accessible group name"],
+]
+for (const [source, contract, message] of requiredCustomizerContracts) if (!source.includes(contract)) fail(message)
+if (customizerSource.includes('<section id="customize"') || customizerSource.includes('<header className="customizer-inline-header"')) {
+  fail("customizer shell must not enter generic section/header preset selectors")
+}
+for (const key of ["ArrowRight", "ArrowLeft", "Home", "End"]) if (!tabsSource.includes(`event.key === "${key}"`)) fail(`tabs are missing ${key} keyboard navigation`)
+
 const mobileSection = curatedCssSource.slice(
   curatedCssSource.indexOf("@media (max-width: 850px)"),
   curatedCssSource.indexOf("@media (max-width: 520px)"),
@@ -87,4 +109,4 @@ for (const id of ["liquid-glass", "aurora-mesh"]) {
   if (!forcedColorsSection.includes(`data-style-id="${id}"`)) fail(`${id} lacks a forced-colors fallback`)
 }
 
-console.log(`Validated ${uniquePresets.size} curated presets, ${retiredMigrations.size} retired migrations, substantive CSS, thumbnails, and responsive guards.`)
+console.log(`Validated ${uniquePresets.size} curated presets, ${retiredMigrations.size} retired migrations, substantive CSS, thumbnails, responsive guards, and the inline customizer contract.`)

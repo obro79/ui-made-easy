@@ -57,13 +57,13 @@
 }
 
 /* Geometry is a separate recipe axis from typography. */
-.theme-scope[data-geometry="square"] :is(.specimen,.card,.button,input,select,.badge,.comparison-card,.comparison-button) { border-radius: 0; }
-.theme-scope[data-geometry="subtle"] :is(.specimen,.card,.button,input,select) { border-radius: max(4px, var(--radius-sm)); }
-.theme-scope[data-geometry="rounded"] :is(.specimen,.card,.comparison-card) { border-radius: max(14px, var(--radius-lg)); }
-.theme-scope[data-geometry="rounded"] :is(.button,input,select,.badge,.comparison-button) { border-radius: max(9px, var(--radius-md)); }
-.theme-scope[data-geometry="pill"] :is(.button,input,select,.badge,.comparison-button) { border-radius: 999px; }
+.theme-scope[data-geometry="square"] :is(.specimen,.card,.button,input,select,.badge,.comparison-card,.comparison-button,.customizer-inline,.customizer-inline button) { border-radius: 0; }
+.theme-scope[data-geometry="subtle"] :is(.specimen,.card,.button,input,select,.customizer-inline,.customizer-inline button) { border-radius: max(4px, var(--radius-sm)); }
+.theme-scope[data-geometry="rounded"] :is(.specimen,.card,.comparison-card,.customizer-inline) { border-radius: max(14px, var(--radius-lg)); }
+.theme-scope[data-geometry="rounded"] :is(.button,input,select,.badge,.comparison-button,.customizer-inline button) { border-radius: max(9px, var(--radius-md)); }
+.theme-scope[data-geometry="pill"] :is(.button,input,select,.badge,.comparison-button,.customizer-inline button) { border-radius: 999px; }
 .theme-scope[data-geometry="mixed"] :is(.card,.specimen):nth-child(odd) { border-radius: 3px 22px; }
-.theme-scope[data-geometry="organic"] :is(.card,.specimen,.comparison-card) { border-radius: 28px 12px 24px 14px; }
+.theme-scope[data-geometry="organic"] :is(.card,.specimen,.comparison-card,.customizer-inline) { border-radius: 28px 12px 24px 14px; }
 
 /* 01 — Minimalism */
 .theme-scope[data-style-id="minimalism"] main { max-width: 1080px; }
@@ -225,9 +225,13 @@
 .theme-scope[data-style-id="neo-brutalism"] .page-hero { grid-template-columns: minmax(0,1fr); padding: var(--space-8,32px); border: 3px solid var(--ink); background: var(--accent-light); box-shadow: 9px 9px 0 var(--ink); }
 .theme-scope[data-style-id="neo-brutalism"] .hero-toolbar { justify-content: flex-start; max-width: none; }
 .theme-scope[data-style-id="neo-brutalism"] .hero-copy h1 { max-width: 11ch; font-size: clamp(60px,8vw,108px); text-transform: uppercase; }
-.theme-scope[data-style-id="neo-brutalism"] :is(.specimen,.card,.comparison-card) { border: 3px solid var(--ink); background: var(--surface); box-shadow: 7px 7px 0 var(--ink); }
-.theme-scope[data-style-id="neo-brutalism"] :is(.button,.comparison-button) { border: 2px solid var(--ink); font-weight: 800; text-transform: uppercase; box-shadow: 4px 4px 0 var(--ink); }
-.theme-scope[data-style-id="neo-brutalism"] :is(.button,.comparison-button):active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--ink); }
+.theme-scope[data-style-id="neo-brutalism"] :is(.specimen,.card,.comparison-card,.customizer-inline) { border: 3px solid var(--ink); background: var(--surface); box-shadow: 7px 7px 0 var(--ink); }
+.theme-scope[data-style-id="neo-brutalism"] :is(.button,.comparison-button) { border: 2px solid var(--ink); border-radius: 0; font-weight: 800; text-transform: uppercase; box-shadow: 4px 4px 0 var(--ink); }
+.theme-scope[data-style-id="neo-brutalism"] .customizer-inline button { border: 2px solid var(--ink); border-radius: 0; font-weight: 800; text-transform: uppercase; }
+.theme-scope[data-style-id="neo-brutalism"] .customizer-inline :is(.palette-wizard__toolbar button,.palette-wizard__apply,.customizer-footer .button) { box-shadow: 4px 4px 0 var(--ink); }
+.theme-scope[data-style-id="neo-brutalism"] .customizer-inline .customizer-tabs { gap: 6px; }
+.theme-scope[data-style-id="neo-brutalism"] .customizer-inline .customizer-tab { min-height: 40px; padding-inline: 2px; border-width: 0 0 3px; box-shadow: none; font-size: .58rem; letter-spacing: -.02em; }
+.theme-scope[data-style-id="neo-brutalism"] :is(.button,.comparison-button,.customizer-inline button):active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--ink); }
 .theme-scope[data-style-id="neo-brutalism"] :is(.specimen-bar,.badge,th) { text-transform: uppercase; }
 
 /* 17 — Collage / Scrapbook */
@@ -277,7 +281,7 @@
 .theme-scope[data-style-id="terminal"] .section-heading h2::before { content: "> "; color: var(--accent); }
 .theme-scope[data-style-id="terminal"] :is(.specimen,.card,.comparison-card) { border-color: color-mix(in srgb,var(--accent) 42%,var(--line)); box-shadow: none; }
 .theme-scope[data-style-id="terminal"] :is(.specimen-bar,th,.badge) { font-family: var(--font-mono); text-transform: uppercase; }
-.theme-scope[data-style-id="terminal"] :is(.button,input,select,.comparison-button) { min-height: 42px; }
+.theme-scope[data-style-id="terminal"] :is(.button,input:not([type="range"]):not([type="color"]),select,.comparison-button) { min-height: 42px; }
 
 @media (max-width: 1050px) {
   .theme-scope[data-style-id="terminal"] .spec-section { grid-template-columns: 1fr; gap: var(--space-4,16px); }
@@ -289,10 +293,10 @@
 .theme-scope[data-style-id="material-3-inspired"] .page-hero { padding: clamp(var(--space-8,32px),5vw,calc(var(--space-12,48px) + var(--space-2,8px))); border-radius: 28px; background: var(--accent-light); }
 .theme-scope[data-style-id="material-3-inspired"] .hero-copy h1 { max-width: 12ch; font-size: clamp(54px,6vw,86px); }
 .theme-scope[data-style-id="material-3-inspired"] :is(.specimen,.card,.comparison-card) { border: 0; border-radius: 20px; background: color-mix(in srgb,var(--surface) 78%,var(--accent-light)); box-shadow: 0 1px 2px rgb(0 0 0 / .08),0 5px 15px rgb(0 0 0 / .06); }
-.theme-scope[data-style-id="material-3-inspired"] :is(.button,.badge,.comparison-button) { min-height: 44px; border-radius: 999px; letter-spacing: .01em; text-transform: none; }
+.theme-scope[data-style-id="material-3-inspired"] :is(.button,.badge,.comparison-button,.customizer-inline button) { min-height: 44px; border-radius: 999px; letter-spacing: .01em; text-transform: none; }
 .theme-scope[data-style-id="material-3-inspired"] .button-secondary { background: color-mix(in srgb,var(--accent) 16%,var(--surface)); }
-.theme-scope[data-style-id="material-3-inspired"] :is(.button,.comparison-button):hover { box-shadow: inset 0 0 0 999px rgb(0 0 0 / .05); }
-.theme-scope[data-style-id="material-3-inspired"] :is(input,select) { min-height: 48px; border-radius: 12px 12px 0 0; background: color-mix(in srgb,var(--accent-light) 58%,var(--surface)); }
+.theme-scope[data-style-id="material-3-inspired"] :is(.button,.comparison-button,.customizer-inline button):hover { box-shadow: inset 0 0 0 999px rgb(0 0 0 / .05); }
+.theme-scope[data-style-id="material-3-inspired"] :is(input:not([type="range"]):not([type="color"]),select) { min-height: 48px; border-radius: 12px 12px 0 0; background: color-mix(in srgb,var(--accent-light) 58%,var(--surface)); }
 
 /* Selector thumbnails mirror the same high-signal DNA without applying the
    full-page layout rules inside the customizer. */

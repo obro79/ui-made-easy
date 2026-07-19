@@ -3,7 +3,7 @@ import { Bell, ChevronDown, CircleHelp, Columns3, Copy, CreditCard, MoreHorizont
 import { Button } from "./components/ui/button"
 import { Badge } from "./components/ui/badge"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "./components/ui/card"
-import { CustomizeTrigger, ThemeCustomizer } from "./components/ThemeCustomizer"
+import { CustomizeTrigger, ThemeCustomizer, type CustomizerPanel } from "./components/ThemeCustomizer"
 import { ExtendedGallery } from "./components/ExtendedGallery"
 import { ComparisonWorkspace } from "./components/ComparisonWorkspace"
 import { StyleDnaPanel } from "./components/StyleDnaPanel"
@@ -26,7 +26,7 @@ function Specimen({ title, children }: { title: string, children: React.ReactNod
 export default function App() {
   const [config, setConfig] = useState(loadTheme)
   const [previewMode, setPreviewMode] = useState<ThemeMode>(() => DARK_FIRST_STYLES.has(resolveStylePresetId(config.preset)) ? "dark" : "light")
-  const [customizerOpen, setCustomizerOpen] = useState(false)
+  const [customizerPanel, setCustomizerPanel] = useState<CustomizerPanel>("colors")
   const [notice, setNotice] = useState("")
   const [open, setOpen] = useState(false)
   const [variants, setVariants] = useState(loadVariants)
@@ -47,7 +47,7 @@ export default function App() {
   useEffect(() => { saveVariants(variants) }, [variants])
 
   useEffect(() => {
-    const modalOpen = customizerOpen || comparisonOpen || saveDialogOpen
+    const modalOpen = comparisonOpen || saveDialogOpen
     if (!modalOpen) return
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = "hidden"
@@ -61,7 +61,7 @@ export default function App() {
       document.body.style.overflow = previousOverflow
       document.removeEventListener("keydown", closeOnEscape)
     }
-  }, [customizerOpen, comparisonOpen, saveDialogOpen])
+  }, [comparisonOpen, saveDialogOpen])
 
   const selectStyle = (name: string) => {
     const nextId = resolveStylePresetId(name)
@@ -82,6 +82,17 @@ export default function App() {
   }
 
   const resetTheme = () => setConfig(createThemeFromPreset(style))
+
+  const showCustomizer = (panel: CustomizerPanel) => {
+    setCustomizerPanel(panel)
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => {
+      const target = document.getElementById("customize")
+      if (!target) return
+      const top = target.getBoundingClientRect().top + window.scrollY - 24
+      window.scrollTo({ top: Math.max(0, top), behavior: "auto" })
+      target.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus({ preventScroll: true })
+    }))
+  }
 
   const flash = (message: string) => {
     setNotice(message)
@@ -122,7 +133,7 @@ export default function App() {
     setStyle(resolveStylePresetId(variant.config.preset))
     setActiveVariantId(id)
     setComparisonOpen(false)
-    setCustomizerOpen(true)
+    showCustomizer("colors")
   }
 
   const copyVariant = (id: string) => {
@@ -140,7 +151,8 @@ export default function App() {
 
   return <div ref={rootRef} className={`app theme-scope ${previewMode === "dark" ? "dark" : ""}`} data-style-id={style} data-layout={activePreset.recipe.layout} data-surface={activePreset.recipe.surface} data-treatment={activePreset.recipe.typography} data-geometry={activePreset.recipe.geometry} data-decoration={activePreset.recipe.decoration} data-motion={motion}>
     <aside><a className="brand" href="#top">Library</a><p className="side-label">Foundations</p>{sections.map((s) => <a key={s} href={`#${s.toLowerCase().replace(" ", "-")}`}>{s}</a>)}<div className="sidebar-bottom"><button className="theme-toggle" onClick={() => setPreviewMode(previewMode === "dark" ? "light" : "dark")}><span className="theme-dot" />{previewMode === "dark" ? "Dark theme" : "Light theme"}</button><p>v0.2 · theme editor</p></div></aside>
-    <main id="top"><header className="page-hero"><div className="hero-copy"><p className="eyebrow">Design system workbench</p><h1>Your UI, all in one place.</h1><p className="lede">Create, save, and compare up to three complete visual directions.</p></div><div className="header-actions hero-toolbar"><Button variant="outline" onClick={() => setCustomizerOpen(true)}><Palette size={16}/>{activePreset.name}</Button><CustomizeTrigger onClick={() => setCustomizerOpen(true)} />{undoConfig && <Button variant="ghost" onClick={undoStyle}><Undo2 size={16}/>Undo style</Button>}<Button variant="outline" onClick={requestSavePreset}><Save size={16}/>{activeVariantId ? "Update preset" : "Save preset"}</Button><Button onClick={() => setComparisonOpen(true)}><Columns3 size={16}/> Compare {variants.length}/3</Button></div></header>
+    <main id="top"><header className="page-hero"><div className="hero-copy"><p className="eyebrow">Design system workbench</p><h1>Your UI, all in one place.</h1><p className="lede">Create, save, and compare up to three complete visual directions.</p></div><div className="header-actions hero-toolbar"><Button variant="outline" aria-controls="customize" onClick={() => showCustomizer("styles")}><Palette size={16}/>{activePreset.name}</Button><CustomizeTrigger onClick={() => showCustomizer("colors")} />{undoConfig && <Button variant="ghost" onClick={undoStyle}><Undo2 size={16}/>Undo style</Button>}<Button variant="outline" onClick={requestSavePreset}><Save size={16}/>{activeVariantId ? "Update preset" : "Save preset"}</Button><Button onClick={() => setComparisonOpen(true)}><Columns3 size={16}/> Compare {variants.length}/3</Button></div></header>
+      <ThemeCustomizer config={config} previewMode={previewMode} onConfigChange={setConfig} onPreviewModeChange={setPreviewMode} onReset={resetTheme} currentStyle={style} onStyleChange={selectStyle} activePanel={customizerPanel} onPanelChange={setCustomizerPanel} />
       <StyleDnaPanel preset={activePreset} />
       <Section id="foundations" label="Foundations"><div className="foundation-grid"><Specimen title="Color"><div className="swatches"><i className="swatch primary"/><i className="swatch ink"/><i className="swatch muted"/><i className="swatch surface"/><i className="swatch danger"/></div></Specimen><Specimen title="Spacing"><div className="spacing"><b style={{width:8}}/><b style={{width:16}}/><b style={{width:24}}/><b style={{width:32}}/><b style={{width:48}}/></div></Specimen><Specimen title="Elevation"><div className="elevation"><span>Subtle</span><span>Raised</span><span>Floating</span></div></Specimen></div></Section>
       <Section id="buttons" label="Buttons"><Specimen title="Variants"><div className="row wrap"><Button>Primary action</Button><Button variant="secondary">Secondary</Button><Button variant="outline">Outline</Button><Button variant="ghost">Ghost</Button><Button variant="destructive">Delete</Button><Button disabled>Disabled</Button></div></Specimen><Specimen title="Sizes & icons"><div className="row"><Button size="sm">Small</Button><Button>Default</Button><Button size="lg">Large <Plus size={16}/></Button><Button variant="outline" aria-label="More options"><MoreHorizontal size={18}/></Button></div></Specimen></Section>
@@ -152,7 +164,6 @@ export default function App() {
       <Section id="feedback" label="Feedback"><div className="two-col"><Specimen title="Alert"><div className="alert"><CircleHelp size={19}/><div><b>Heads up!</b><p>Your account has been successfully updated.</p></div></div></Specimen><Specimen title="Dropdown"><div className="dropdown-wrap"><Button variant="outline" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen(!open)}>Account <ChevronDown size={16}/></Button>{open && <div className="menu" role="menu"><button role="menuitem" onClick={() => { setOpen(false); flash("Settings selected.") }}><Settings size={15}/> Settings</button><button role="menuitem" onClick={() => { setOpen(false); flash("Billing selected.") }}><CreditCard size={15}/> Billing</button><hr/><button className="danger" role="menuitem" onClick={() => { setOpen(false); flash("Delete account selected.") }}><Trash2 size={15}/> Delete account</button></div>}</div></Specimen></div></Section>
       <footer>Built as a starting point. Replace the palette and type tokens in <code>src/styles.css</code> to make it yours.</footer>
     </main>{notice && <div className="toast" role="status"><Bell size={17}/><span>{notice}</span><button onClick={() => setNotice("")}>Dismiss</button></div>}
-    <ThemeCustomizer open={customizerOpen} config={config} previewMode={previewMode} onOpenChange={setCustomizerOpen} onConfigChange={setConfig} onPreviewModeChange={setPreviewMode} onReset={resetTheme} currentStyle={style} onStyleChange={selectStyle} />
     {comparisonOpen && <ComparisonWorkspace variants={variants} mode={previewMode} onEdit={editVariant} onDuplicate={copyVariant} onRemove={deleteVariant} onClose={() => setComparisonOpen(false)} />}
     {saveDialogOpen && <div className="save-preset-layer" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setSaveDialogOpen(false) }}><form className="save-preset-dialog" role="dialog" aria-modal="true" aria-labelledby="save-preset-title" onSubmit={saveCurrentVariant}><p className="eyebrow">Preset library</p><h2 id="save-preset-title">{activeVariantId ? "Update preset" : "Save this preset"}</h2><p>Give this direction a memorable name. Its colors, spacing, typography, and visual style will all be saved.</p><label htmlFor="preset-name">Preset name</label><input id="preset-name" autoFocus maxLength={60} value={presetName} onChange={(event) => setPresetName(event.target.value)} placeholder="e.g. Calm SaaS" /><div className="save-preset-actions"><Button type="button" variant="ghost" onClick={() => setSaveDialogOpen(false)}>Cancel</Button><Button type="submit" disabled={!presetName.trim()}><Save size={16}/>{activeVariantId ? "Update preset" : "Save preset"}</Button></div><span className="save-preset-capacity">{variants.length}/3 presets saved</span></form></div>}
   </div>

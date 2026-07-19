@@ -18,6 +18,6 @@
 .header-actions .button, .header-actions .customize-trigger { white-space: nowrap; }
 .theme-scope { font-family: var(--font-body, Manrope, ui-sans-serif, system-ui, sans-serif); }
 .theme-scope :is(h1, h2, h3, h4, .card-title) { font-family: var(--font-heading, Manrope, ui-sans-serif, system-ui, sans-serif); }
-.customizer-footer .export-kit-button { grid-column: 1 / -1; }
+.customizer-footer .export-kit-button { grid-column: auto; }
 @media (max-width: 520px) { .save-preset-layer { align-items: end; padding: 0; } .save-preset-dialog { border-radius: 20px 20px 0 0; padding: 24px 20px max(24px, env(safe-area-inset-bottom)); } .save-preset-actions .button { min-height: 44px; flex: 1; } }
 @media (prefers-reduced-motion: reduce) { .button { transition: none; } }

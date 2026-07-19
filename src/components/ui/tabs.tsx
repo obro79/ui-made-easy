@@ -27,8 +27,31 @@ export function Tabs({ value, defaultValue = "", onValueChange, className, child
   return <TabsContext.Provider value={{ value: activeValue, setValue, baseId }}><div className={["ui-tabs", className].filter(Boolean).join(" ")} {...props}>{children}</div></TabsContext.Provider>
 }
 
-export function TabsList({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return <div role="tablist" className={["ui-tabs-list", className].filter(Boolean).join(" ")} {...props} />
+export function TabsList({ className, onKeyDown, ...props }: HTMLAttributes<HTMLDivElement>) {
+  return <div
+    role="tablist"
+    className={["ui-tabs-list", className].filter(Boolean).join(" ")}
+    onKeyDown={(event) => {
+      onKeyDown?.(event)
+      if (event.defaultPrevented) return
+
+      const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]:not(:disabled)'))
+      const currentIndex = tabs.indexOf(event.target as HTMLButtonElement)
+      if (currentIndex < 0) return
+
+      let nextIndex: number | null = null
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (currentIndex + 1) % tabs.length
+      if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (currentIndex - 1 + tabs.length) % tabs.length
+      if (event.key === "Home") nextIndex = 0
+      if (event.key === "End") nextIndex = tabs.length - 1
+      if (nextIndex === null) return
+
+      event.preventDefault()
+      tabs[nextIndex]?.focus()
+      tabs[nextIndex]?.click()
+    }}
+    {...props}
+  />
 }
 
 export type TabsTriggerProps = ButtonHTMLAttributes<HTMLButtonElement> & { value: string }

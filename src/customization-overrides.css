@@ -11,7 +11,7 @@
 .app.theme-scope .switch input,.app.theme-scope .ui-progress-track{border-radius:calc(var(--radius,8px) * 3)}
 .app.theme-scope :is(.specimen-content,.card-header,.ui-dialog-content,.ui-alert-dialog-content,.ui-empty){padding:var(--surface-padding,24px)}
 .app.theme-scope :is(.foundation-grid,.two-col,.card-grid,.row,.form-stack,.ui-alert,.ui-dialog-footer,.ui-alert-dialog-footer){gap:var(--layout-gap,16px)}
-.app.theme-scope :is(.button,input,select){min-height:var(--control-height,40px)}
+.app.theme-scope :is(.button,input:not([type="color"]),select){min-height:var(--control-height,40px)}
 .app.theme-scope .button{padding-inline:var(--control-padding-x,16px)}
 .app.theme-scope :is(.button,input,select,.menu,.ui-alert,.ui-popover-content,.ui-dialog-content,.ui-alert-dialog-content){border-color:var(--border,var(--line));color:var(--foreground,var(--ink))}
 .app.theme-scope :is(.button-default,.ui-alert-dialog-action){color:var(--primary-foreground,#fff);background:var(--primary,var(--accent))}

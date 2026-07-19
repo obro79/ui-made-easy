@@ -5,7 +5,8 @@ A visual UI-system laboratory for exploring, tuning, comparing, saving, and expo
 ## What it does
 
 - Presents buttons, typography, forms, cards, tables, navigation, overlays, loading states, feedback, and other common UI primitives together.
-- Generates five-colour palettes with editable hex values, per-colour locks, contrast feedback, a Space-key shuffle shortcut, and one-click application across the workbench.
+- Keeps the complete editor visible directly below the hero, with persistent Styles, Colors, Type, Layout, and Tokens tabs instead of a hidden drawer.
+- Generates five-colour palettes with editable hex values, per-colour locks, contrast feedback, randomization, and one-click application across the workbench’s coordinated light and dark modes.
 - Includes a token-aware playground for spinner, dots, pulse, equalizer, orbit, and skeleton loading treatments, with play/pause and reduced-motion support.
 - Includes 20 curated styles across product, layout, effects, expressive, and design-system-inspired categories.
 - Gives every style a documented reference basis, signature traits, misuse warnings, intended uses, and accessibility adaptations.
@@ -42,7 +43,7 @@ Open the local URL printed by Vite.
 
 ```bash
 npm run dev          # Start the local workbench
-npm run test:styles  # Verify the curated registry, migrations, visual signatures, and responsive guards
+npm run test:styles  # Verify presets, migrations, visual signatures, responsive guards, and the inline editor contract
 npm run build        # Type-check and create a production build
 npm run preview      # Preview the production build
 ```

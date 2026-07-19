@@ -1,5 +1,5 @@
-import { useEffect, useId, useRef, useState } from "react"
-import { Check, ChevronDown, Copy, Download, RotateCcw, SlidersHorizontal, X } from "lucide-react"
+import { useId, useState } from "react"
+import { Check, ChevronDown, Code2, Copy, Download, LayoutGrid, Palette, RotateCcw, SlidersHorizontal, Type } from "lucide-react"
 import {
   exportThemeCss,
   getContrastRatio,
@@ -11,17 +11,29 @@ import { PaletteWizard } from "./PaletteWizard"
 import { StyleSelector } from "./StyleSelector"
 import { FONT_PAIRS, FontSelector } from "./FontSelector"
 import { downloadStarterKitZip } from "../export-project"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
+import { Button } from "./ui/button"
+
+export type CustomizerPanel = "styles" | "colors" | "type" | "layout" | "tokens"
+
+const CUSTOMIZER_PANELS = [
+  { id: "styles", label: "Styles", Icon: LayoutGrid },
+  { id: "colors", label: "Colors", Icon: Palette },
+  { id: "type", label: "Type", Icon: Type },
+  { id: "layout", label: "Layout", Icon: SlidersHorizontal },
+  { id: "tokens", label: "Tokens", Icon: Code2 },
+] as const
 
 type ThemeCustomizerProps = {
-  open: boolean
   config: ThemeConfig
   previewMode: ThemeMode
-  onOpenChange: (open: boolean) => void
   onConfigChange: (config: ThemeConfig) => void
   onPreviewModeChange: (mode: ThemeMode) => void
   onReset: () => void
   currentStyle: string
   onStyleChange: (style: string) => void
+  activePanel: CustomizerPanel
+  onPanelChange: (panel: CustomizerPanel) => void
 }
 
 const tokenLabels: Record<keyof SemanticPalette, string> = {
@@ -47,36 +59,21 @@ const contrastPairs: Array<[keyof SemanticPalette, keyof SemanticPalette, string
 const isHex = (value: string) => /^#[0-9a-f]{6}$/i.test(value)
 
 export function ThemeCustomizer({
-  open,
   config,
   previewMode,
-  onOpenChange,
   onConfigChange,
   onPreviewModeChange,
   onReset,
   currentStyle,
   onStyleChange,
+  activePanel,
+  onPanelChange,
 }: ThemeCustomizerProps) {
   const titleId = useId()
-  const drawerRef = useRef<HTMLDivElement>(null)
   const [advanced, setAdvanced] = useState(false)
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle")
   const [exportState, setExportState] = useState<"idle" | "working" | "done" | "error">("idle")
   const palette = config[previewMode]
-
-  useEffect(() => {
-    if (!open) return
-    const previousFocus = document.activeElement as HTMLElement | null
-    drawerRef.current?.focus()
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onOpenChange(false)
-    }
-    document.addEventListener("keydown", closeOnEscape)
-    return () => {
-      document.removeEventListener("keydown", closeOnEscape)
-      previousFocus?.focus()
-    }
-  }, [open, onOpenChange])
 
   const updateConfig = (patch: Partial<ThemeConfig>) =>
     onConfigChange({ ...config, ...patch })
@@ -107,51 +104,60 @@ export function ThemeCustomizer({
     window.setTimeout(() => setExportState("idle"), 2200)
   }
 
-  if (!open) return null
-
   return (
-    <div className="customizer-layer" role="presentation">
-      <button
-        className="customizer-backdrop"
-        aria-label="Close theme customizer"
-        onClick={() => onOpenChange(false)}
-      />
-      <div
-        ref={drawerRef}
-        className="customizer-drawer"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-      >
-        <header className="customizer-header">
-          <div>
-            <span className="eyebrow">Design system</span>
-            <h2 id={titleId}>Customize theme</h2>
-          </div>
-          <button className="icon-btn" aria-label="Close" onClick={() => onOpenChange(false)}>
-            <X aria-hidden="true" size={18} />
-          </button>
-        </header>
+    <div id="customize" className="customizer-inline" role="region" aria-labelledby={titleId}>
+      <div className="customizer-inline-header">
+        <div>
+          <span className="eyebrow">Live theme controls</span>
+          <h2 id={titleId}>Customize the system</h2>
+          <p>Choose a direction, tune its colors and type, then export the same tokens and components.</p>
+        </div>
+        <span className="customizer-inline-current">Editing · {CUSTOMIZER_PANELS.find((panel) => panel.id === activePanel)?.label}</span>
+      </div>
 
-        <div className="customizer-scroll">
-          <section className="customizer-section">
-            <StyleSelector value={currentStyle} onChange={onStyleChange} mode={previewMode} />
-          </section>
-          <section className="customizer-section">
-            <FontSelector
-              value={FONT_PAIRS.find((pair) => pair.headingFamily === config.headingFont && pair.bodyFamily === config.bodyFont)?.id ?? "modern-sans"}
-              onChange={(pair) => updateConfig({ headingFont: pair.headingFamily, bodyFont: pair.bodyFamily })}
-            />
-          </section>
-          <PaletteWizard key={config.preset} config={config} onChange={onConfigChange} />
+        <Tabs
+          className="customizer-workspace"
+          value={activePanel}
+          onValueChange={(value) => onPanelChange(value as CustomizerPanel)}
+        >
+          <TabsList className="customizer-tabs" aria-label="Theme customization sections">
+            {CUSTOMIZER_PANELS.map(({ id, label, Icon }) => (
+              <TabsTrigger className="customizer-tab" value={id} key={id}>
+                <Icon aria-hidden="true" size={15} />
+                <span>{label}</span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          <div className="customizer-scroll">
+            <TabsContent className="customizer-panel" value="styles" forceMount>
+              <section className="customizer-section">
+                <StyleSelector value={currentStyle} onChange={onStyleChange} mode={previewMode} />
+              </section>
+            </TabsContent>
+
+            <TabsContent className="customizer-panel" value="type" forceMount>
+              <section className="customizer-section">
+                <FontSelector
+                  value={FONT_PAIRS.find((pair) => pair.headingFamily === config.headingFont && pair.bodyFamily === config.bodyFont)?.id ?? "modern-sans"}
+                  onChange={(pair) => updateConfig({ headingFont: pair.headingFamily, bodyFont: pair.bodyFamily })}
+                />
+              </section>
+            </TabsContent>
+
+            <TabsContent className="customizer-panel" value="colors" forceMount>
+              <PaletteWizard key={config.preset} config={config} onChange={onConfigChange} />
+            </TabsContent>
+
+            <TabsContent className="customizer-panel" value="layout" forceMount>
 
           <section className="customizer-section" aria-labelledby="spacing-title">
             <h3 id="spacing-title">Spacing & density</h3>
-            <div className="segmented-control" aria-label="Interface density">
+            <div className="segmented-control" role="group" aria-label="Interface density">
               {(["compact", "default", "comfortable"] as const).map((density) => (
                 <button
                   key={density}
+                  type="button"
                   aria-pressed={config.density === density}
                   className={config.density === density ? "active" : ""}
                   onClick={() => updateConfig({ density })}
@@ -201,7 +207,7 @@ export function ThemeCustomizer({
 
             <div className="control-group">
               <span className="control-label" id="shadow-label">Shadow</span>
-              <div className="segmented-control" aria-labelledby="shadow-label">
+              <div className="segmented-control" role="group" aria-labelledby="shadow-label">
                 {(["none", "soft", "medium", "strong"] as const).map((shadow) => (
                   <button
                     key={shadow}
@@ -254,7 +260,7 @@ export function ThemeCustomizer({
                 <p>Choose how tightly the gallery content is framed.</p>
               </div>
             </div>
-            <div className="segmented-control" aria-label="Content width">
+            <div className="segmented-control" role="group" aria-label="Content width">
               {(["narrow", "standard", "wide"] as const).map((contentWidth) => (
                 <button
                   key={contentWidth}
@@ -268,23 +274,25 @@ export function ThemeCustomizer({
               ))}
             </div>
           </section>
+            </TabsContent>
 
-          <section className="customizer-section" aria-labelledby="tokens-title">
+            <TabsContent className="customizer-panel" value="tokens" forceMount>
+              <section className="customizer-section" aria-labelledby="tokens-title">
             <div className="customizer-section-heading">
               <div>
                 <h3 id="tokens-title">Theme tokens</h3>
                 <p>Fine-tune the generated colors for each mode.</p>
               </div>
-              <button className="text-btn" aria-expanded={advanced} onClick={() => setAdvanced(!advanced)}>
+              <button type="button" className="text-btn" aria-expanded={advanced} onClick={() => setAdvanced(!advanced)}>
                 Advanced <ChevronDown aria-hidden="true" size={15} />
               </button>
             </div>
-            <div className="segmented-control mode-tabs" role="tablist" aria-label="Color mode">
+            <div className="segmented-control mode-tabs" role="group" aria-label="Color mode">
               {(["light", "dark"] as ThemeMode[]).map((mode) => (
                 <button
                   key={mode}
-                  role="tab"
-                  aria-selected={previewMode === mode}
+                  type="button"
+                  aria-pressed={previewMode === mode}
                   className={previewMode === mode ? "active" : ""}
                   onClick={() => onPreviewModeChange(mode)}
                 >
@@ -305,7 +313,7 @@ export function ThemeCustomizer({
                 ))}
               </div>
             )}
-          </section>
+              </section>
 
           <section className="customizer-section" aria-labelledby="contrast-title">
             <h3 id="contrast-title">Contrast</h3>
@@ -322,34 +330,36 @@ export function ThemeCustomizer({
                 )
               })}
             </div>
-          </section>
-        </div>
+              </section>
+            </TabsContent>
+          </div>
+        </Tabs>
 
         <footer className="customizer-footer">
-          <button className="btn secondary" onClick={onReset}>
+          <Button type="button" variant="secondary" onClick={onReset}>
             <RotateCcw aria-hidden="true" size={16} /> Reset
-          </button>
-          <button className="btn primary" onClick={copyCss}>
+          </Button>
+          <Button type="button" aria-label="Copy theme CSS" onClick={copyCss}>
             {copyState === "copied" ? <Check size={16} /> : <Copy size={16} />}
-            {copyState === "copied" ? "Copied" : copyState === "error" ? "Copy failed" : "Copy CSS"}
-          </button>
-          <button className="btn primary export-kit-button" onClick={exportKit} disabled={exportState === "working"}>
+            {copyState === "copied" ? "Copied" : copyState === "error" ? "Failed" : "Copy"}
+          </Button>
+          <Button type="button" className="export-kit-button" aria-label="Export Tailwind starter kit" onClick={exportKit} disabled={exportState === "working"}>
             {exportState === "done" ? <Check size={16} /> : <Download size={16} />}
-            {exportState === "working" ? "Building ZIP…" : exportState === "done" ? "Starter kit exported" : exportState === "error" ? "Export failed" : "Export Tailwind starter kit"}
-          </button>
+            {exportState === "working" ? "Building…" : exportState === "done" ? "Exported" : exportState === "error" ? "Failed" : "Export kit"}
+          </Button>
           <span className="sr-only" aria-live="polite">
-            {copyState === "copied" ? "Theme CSS copied to clipboard" : copyState === "error" ? "Could not copy theme CSS" : ""}
+            <span>{copyState === "copied" ? "Theme CSS copied to clipboard" : copyState === "error" ? "Could not copy theme CSS" : ""}</span>
+            <span>{exportState === "working" ? "Building Tailwind starter kit" : exportState === "done" ? "Tailwind starter kit exported" : exportState === "error" ? "Could not export Tailwind starter kit" : ""}</span>
           </span>
         </footer>
-      </div>
     </div>
   )
 }
 
 export function CustomizeTrigger({ onClick }: { onClick: () => void }) {
   return (
-    <button className="btn secondary customize-trigger" onClick={onClick}>
+    <Button type="button" variant="secondary" className="customize-trigger" aria-controls="customize" onClick={onClick}>
       <SlidersHorizontal aria-hidden="true" size={16} /> Customize
-    </button>
+    </Button>
   )
 }
