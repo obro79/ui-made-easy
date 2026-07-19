@@ -68,8 +68,10 @@ test("motion, speed, loading, radii, surface, and type settings propagate", asyn
 
 test("builder essentials support their primary mouse and keyboard paths", async ({ page }) => {
   test.setTimeout(60_000)
-  await page.locator("#builder-essentials").scrollIntoViewIfNeeded()
-  await expect(page.getByRole("heading", { name: "Builder essentials" })).toBeVisible()
+  const builderHeading = page.getByRole("heading", { name: "Builder essentials" })
+  await builderHeading.waitFor({ state: "attached" })
+  await builderHeading.scrollIntoViewIfNeeded()
+  await expect(builderHeading).toBeVisible()
 
   await page.keyboard.press("Control+k")
   const command = page.getByRole("dialog", { name: "Global command menu" })
