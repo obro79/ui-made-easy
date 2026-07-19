@@ -35,8 +35,8 @@ const legacyMigrations = parseMap("LEGACY_PRESET_MAP")
 const retiredMigrations = parseMap("RETIRED_PRESET_MAP")
 
 const fail = (message) => { throw new Error(`Style catalog validation failed: ${message}`) }
-if (presetIds.length !== 20 || uniquePresets.size !== 20) fail(`expected 20 unique curated presets, found ${presetIds.length}/${uniquePresets.size}`)
-if (definedPresetIds.length !== 40 || new Set(definedPresetIds).size !== 40) fail(`expected 40 unique source definitions, found ${definedPresetIds.length}/${new Set(definedPresetIds).size}`)
+if (presetIds.length !== 24 || uniquePresets.size !== 24) fail(`expected 24 unique curated presets, found ${presetIds.length}/${uniquePresets.size}`)
+if (definedPresetIds.length !== 44 || new Set(definedPresetIds).size !== 44) fail(`expected 44 unique source definitions, found ${definedPresetIds.length}/${new Set(definedPresetIds).size}`)
 for (const id of uniquePresets) if (!definedPresetIds.includes(id)) fail(`curated preset ${id} has no definition`)
 for (const field of ["basis", "signatures", "mustAvoid", "bestFor", "a11y"]) {
   if (!presetsSource.includes(field)) fail(`missing authenticity field ${field}`)
@@ -154,7 +154,7 @@ const requiredCustomizerContracts = [
   [appSource, "</header>\n      <ThemeCustomizer", "customizer must remain the first workspace section after the hero"],
   [customizerSource, '<div id="customize" className="customizer-inline" role="region"', "customizer shell must be a labeled region"],
   [customizerSource, '<div className="customizer-inline-header">', "customizer heading must not inherit broad header recipes"],
-  [customizerSource, 'export type CustomizerPanel = "styles" | "colors" | "type" | "layout" | "tokens"', "customizer must expose all five control panels"],
+  [customizerSource, 'export type CustomizerPanel = "styles" | "colors" | "type" | "layout" | "motion" | "tokens"', "customizer must expose all six control panels"],
   [paletteSource, "const previousIncomingSignature = useRef(incomingSignature)", "palette must refresh after external theme changes"],
   [paletteSource, "lastAppliedSignature.current = paletteSignature", "palette Apply must preserve local locks and status"],
   [customizerCssSource, ".customizer-inline :is(.style-selector__grid,.font-selector__grid) { max-height: none; overflow: visible;", "inline selectors must use the document as their scroll owner"],
