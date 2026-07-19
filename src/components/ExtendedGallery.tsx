@@ -24,7 +24,7 @@ function GallerySpecimen({ title, children }: { title: string; children: React.R
   return <div className="specimen"><div className="specimen-bar"><span>{title}</span><span>Interactive</span></div><div className="specimen-content">{children}</div></div>
 }
 
-export function ExtendedGallery() {
+export function ExtendedGallery({ onAction }: { onAction: (message: string) => void }) {
   return <>
     <GallerySection id="navigation" label="Navigation">
       <div className="extended-stack">
@@ -42,13 +42,13 @@ export function ExtendedGallery() {
     <GallerySection id="overlays" label="Overlays">
       <div className="overlay-demo-grid">
         <GallerySpecimen title="Dialog">
-          <Dialog><DialogTrigger className="button button-outline button-default">Edit profile</DialogTrigger><DialogContent><DialogHeader><DialogTitle>Edit profile</DialogTitle><DialogDescription>Make changes to your public profile details.</DialogDescription></DialogHeader><label className="dialog-field">Display name<input defaultValue="Owen Fisher" /></label><DialogFooter><DialogClose className="button button-outline button-default">Cancel</DialogClose><DialogClose className="button button-default">Save changes</DialogClose></DialogFooter></DialogContent></Dialog>
+          <Dialog><DialogTrigger className="button button-outline button-size-default">Edit profile</DialogTrigger><DialogContent><DialogHeader><DialogTitle>Edit profile</DialogTitle><DialogDescription>Make changes to your public profile details.</DialogDescription></DialogHeader><label className="dialog-field">Display name<input defaultValue="Owen Fisher" /></label><DialogFooter><DialogClose className="button button-outline button-size-default">Cancel</DialogClose><DialogClose className="button button-default button-size-default">Save changes</DialogClose></DialogFooter></DialogContent></Dialog>
         </GallerySpecimen>
         <GallerySpecimen title="Alert dialog">
-          <AlertDialog><AlertDialogTrigger className="button button-destructive button-default"><Trash2 size={15}/> Delete project</AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete this project?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone. All component settings will be removed.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction>Delete project</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+          <AlertDialog><AlertDialogTrigger className="button button-destructive button-size-default"><Trash2 size={15}/> Delete project</AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Delete this project?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone. All component settings will be removed.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Cancel</AlertDialogCancel><AlertDialogAction>Delete project</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
         </GallerySpecimen>
         <GallerySpecimen title="Popover & tooltip">
-          <div className="row wrap"><Popover><PopoverTrigger className="button button-outline button-default"><Filter size={15}/> Filters</PopoverTrigger><PopoverContent aria-label="Filter projects"><strong>Filter projects</strong><label className="popover-check"><input type="checkbox" defaultChecked/> Active projects</label><label className="popover-check"><input type="checkbox"/> Archived projects</label></PopoverContent></Popover><Tooltip content="Notification preferences" side="top"><button className="button button-ghost button-default" aria-label="Notification preferences"><Bell size={17}/></button></Tooltip></div>
+          <div className="row wrap"><Popover><PopoverTrigger className="button button-outline button-size-default"><Filter size={15}/> Filters</PopoverTrigger><PopoverContent aria-label="Filter projects"><strong>Filter projects</strong><label className="popover-check"><input type="checkbox" defaultChecked/> Active projects</label><label className="popover-check"><input type="checkbox"/> Archived projects</label></PopoverContent></Popover><Tooltip content="Notification preferences" side="top"><button className="button button-ghost button-size-default" aria-label="Notification preferences"><Bell size={17}/></button></Tooltip></div>
         </GallerySpecimen>
       </div>
     </GallerySection>
@@ -59,10 +59,10 @@ export function ExtendedGallery() {
           <GallerySpecimen title="Accordion"><Accordion defaultOpen={["item-1"]} items={[{id:"item-1",title:"Is this reusable?",content:"Yes. Every primitive lives in its own source file and shares semantic tokens."},{id:"item-2",title:"Does it support dark mode?",content:"The palette generator creates matching light and dark themes."},{id:"item-3",title:"Can I copy the CSS?",content:"Use Customize → Copy CSS to export the current variables."}]}/></GallerySpecimen>
           <GallerySpecimen title="Progress"><div className="progress-stack"><Progress label="Profile setup" value={72} showValue/><Progress label="Uploading assets"/><Progress label="Storage used" value={38} showValue/></div></GallerySpecimen>
         </div>
-        <GallerySpecimen title="Alerts"><div className="alert-stack"><Alert variant="info" title="New component available" description="The command palette is ready to add." action={<Button variant="ghost" size="sm">View</Button>}/><Alert variant="success" title="Theme saved" description="Your custom tokens are stored locally."/><Alert variant="warning" title="Contrast needs attention" description="Muted text is below AA on the selected surface."/><Alert variant="destructive" title="Build failed" description="Fix the missing export and try again."/></div></GallerySpecimen>
+        <GallerySpecimen title="Alerts"><div className="alert-stack"><Alert variant="info" title="New component available" description="The command palette is ready to add." action={<Button variant="ghost" size="sm" onClick={() => onAction("Command palette details opened.")}>View</Button>}/><Alert variant="success" title="Theme saved" description="Your custom tokens are stored locally."/><Alert variant="warning" title="Contrast needs attention" description="Muted text is below AA on the selected surface."/><Alert variant="destructive" title="Build failed" description="Fix the missing export and try again."/></div></GallerySpecimen>
         <GallerySpecimen title="Loading animations"><LoadingPlayground /></GallerySpecimen>
         <div className="two-col">
-          <GallerySpecimen title="Empty state"><EmptyState icon={<Inbox size={25}/>} title="No components found" description="Try another filter or add your first custom component." action={<Button size="sm"><UserPlus size={15}/> Add component</Button>}/></GallerySpecimen>
+          <GallerySpecimen title="Empty state"><EmptyState icon={<Inbox size={25}/>} title="No components found" description="Try another filter or add your first custom component." action={<Button size="sm" onClick={() => onAction("Add component flow opened.")}><UserPlus size={15}/> Add component</Button>}/></GallerySpecimen>
           <GallerySpecimen title="Skeletons"><div className="skeleton-demo"><SkeletonCard/><div className="skeleton-list"><Skeleton shape="circle"/><div><Skeleton shape="text"/><Skeleton shape="text"/></div></div></div></GallerySpecimen>
         </div>
       </div>

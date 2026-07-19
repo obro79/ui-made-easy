@@ -1,16 +1,19 @@
-import { isThemeConfig, migrateThemeConfig, type ThemeConfig } from "./theme"
+import { preferredThemeMode } from "./presets"
+import { isThemeConfig, migrateThemeConfig, type ThemeConfig, type ThemeMode } from "./theme"
 
 export type SavedVariant = {
   id: string
   name: string
   config: ThemeConfig
+  previewMode: ThemeMode
   updatedAt: string
 }
 
 export const MAX_SAVED_VARIANTS = 3
 export const MAX_VARIANT_NAME_LENGTH = 60
-export const VARIANTS_STORAGE_KEY = "ui-component-gallery.variants.v1"
-const VARIANTS_VERSION = 1 as const
+export const VARIANTS_STORAGE_KEY = "ui-component-gallery.variants.v2"
+const LEGACY_VARIANTS_STORAGE_KEY = "ui-component-gallery.variants.v1"
+const VARIANTS_VERSION = 2 as const
 
 type VariantsStore = {
   version: typeof VARIANTS_VERSION
@@ -40,6 +43,7 @@ function isSavedVariant(value: unknown): value is SavedVariant {
   const variant = value as Partial<SavedVariant>
   return typeof variant.id === "string" && variant.id.length > 0 &&
     isVariantNameValid(variant.name) && variant.name === variant.name.trim() &&
+    (variant.previewMode === "light" || variant.previewMode === "dark") &&
     typeof variant.updatedAt === "string" && Number.isFinite(Date.parse(variant.updatedAt)) &&
     isThemeConfig(variant.config)
 }
@@ -68,16 +72,19 @@ export function loadVariants(
 ): SavedVariant[] {
   if (!storage) return []
   try {
-    const raw = storage.getItem(VARIANTS_STORAGE_KEY)
+    const raw = storage.getItem(VARIANTS_STORAGE_KEY) ?? storage.getItem(LEGACY_VARIANTS_STORAGE_KEY)
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
     if (!parsed || typeof parsed !== "object") return []
     const store = parsed as Partial<VariantsStore>
-    if (store.version !== VARIANTS_VERSION || !Array.isArray(store.variants) || store.variants.length > MAX_SAVED_VARIANTS) return []
+    if ((store.version !== VARIANTS_VERSION && store.version !== 1) || !Array.isArray(store.variants) || store.variants.length > MAX_SAVED_VARIANTS) return []
     const migrated = store.variants.map((variant) => {
       if (!variant || typeof variant !== "object") return null
       const config = migrateThemeConfig((variant as SavedVariant).config)
-      return config ? { ...(variant as SavedVariant), config } : null
+      if (!config) return null
+      const rawMode = (variant as Partial<SavedVariant>).previewMode
+      const previewMode = rawMode === "light" || rawMode === "dark" ? rawMode : preferredThemeMode(config.preset)
+      return { ...(variant as SavedVariant), config, previewMode }
     })
     if (migrated.some((variant) => !variant || !isSavedVariant(variant))) return []
     const variants = migrated as SavedVariant[]
@@ -108,6 +115,7 @@ export function createVariant(
   variants: readonly SavedVariant[],
   config: ThemeConfig,
   name?: string,
+  previewMode: ThemeMode = preferredThemeMode(config.preset),
 ): SavedVariant[] {
   assertCapacity(variants)
   if (!isThemeConfig(config)) throw new TypeError("Cannot save an invalid theme configuration")
@@ -115,6 +123,7 @@ export function createVariant(
     id: localId(),
     name: nextName(variants, name),
     config: cloneConfig(config),
+    previewMode,
     updatedAt: new Date().toISOString(),
   }
   return [...variants.map(cloneVariant), variant]
@@ -125,6 +134,7 @@ export function updateVariant(
   id: string,
   config: ThemeConfig,
   name?: string,
+  previewMode: ThemeMode = preferredThemeMode(config.preset),
 ): SavedVariant[] {
   if (!isThemeConfig(config)) throw new TypeError("Cannot save an invalid theme configuration")
   const cleanName = name === undefined ? undefined : validatedName(name)
@@ -132,6 +142,7 @@ export function updateVariant(
     ...variant,
     name: cleanName || variant.name,
     config: cloneConfig(config),
+    previewMode,
     updatedAt: new Date().toISOString(),
   } : cloneVariant(variant))
 }
@@ -158,5 +169,5 @@ export function duplicateVariant(
   const source = variants.find((variant) => variant.id === id)
   if (!source) return variants.map(cloneVariant)
   const generatedName = `${source.name} Copy`.slice(0, MAX_VARIANT_NAME_LENGTH).trim()
-  return createVariant(variants, source.config, name === undefined ? generatedName : validatedName(name))
+  return createVariant(variants, source.config, name === undefined ? generatedName : validatedName(name), source.previewMode)
 }

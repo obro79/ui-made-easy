@@ -24,7 +24,8 @@ export function LoadingPlayground() {
         <button
           className="loading-playground__toggle"
           type="button"
-          aria-pressed={!playing}
+          aria-pressed={playing}
+          aria-label={`Loading motion ${playing ? "on" : "off"}`}
           onClick={() => setPlaying((current) => !current)}
         >
           {playing ? <Pause size={15} aria-hidden="true" /> : <Play size={15} aria-hidden="true" />}

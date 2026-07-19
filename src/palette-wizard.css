@@ -35,6 +35,7 @@
 .palette-wizard__contrast .is-pass { color: var(--success,#16845b); }
 .palette-wizard__contrast .is-warning { color: var(--destructive,var(--danger)); }
 .palette-wizard__apply { width: 100%; min-height: 48px; color: var(--primary-foreground,#fff); background: var(--primary,var(--accent)); border-color: transparent; font-size: .82rem; }
+.palette-wizard__apply:disabled { opacity: .48; cursor: not-allowed; transform: none; }
 .palette-wizard__status { min-height: 18px; margin: -12px 0 0; color: var(--muted-foreground,var(--muted)); font-size: .7rem; text-align: center; }
 
 .palette-wizard button:focus-visible,.palette-wizard input:focus-visible,.palette-wizard__native-picker:focus-within { outline: 3px solid var(--focus-ring,var(--accent)); outline-offset: 2px; }

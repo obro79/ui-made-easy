@@ -116,11 +116,15 @@ export function checkContrast(foreground: string, background: string): ContrastC
   return { foreground, background, ratio, aaNormal: ratio >= 4.5, aaLarge: ratio >= 3, aaaNormal: ratio >= 7 }
 }
 
-export function bestContrastingColor(background: string, candidates = ["#ffffff", "#111111"]): string {
+export function bestContrastingColor(background: string, candidates = ["#ffffff", "#000000"]): string {
   if (candidates.length === 0) throw new Error("At least one contrast candidate is required")
   return candidates.reduce((best, candidate) =>
     contrastRatio(candidate, background) > contrastRatio(best, background) ? candidate : best,
   )
+}
+
+export function accessibleFocusRing(background: string, preferred: string): string {
+  return contrastRatio(preferred, background) >= 3 ? normalizeHex(preferred)! : bestContrastingColor(background)
 }
 
 export function generatePalettes(seed: string): Pick<ThemeConfig, "light" | "dark"> {
@@ -142,7 +146,7 @@ export function generatePalettes(seed: string): Pick<ThemeConfig, "light" | "dar
       secondary: mixColors(primary, "#ffffff", 0.88),
       destructive: "#c93636",
       success: "#16845b",
-      focusRing: mixColors(primary, "#ffffff", 0.18),
+      focusRing: accessibleFocusRing(lightBackground, mixColors(primary, "#ffffff", 0.18)),
     },
     dark: {
       background: darkBackground,
@@ -155,7 +159,7 @@ export function generatePalettes(seed: string): Pick<ThemeConfig, "light" | "dar
       secondary: mixColors(primary, darkSurface, 0.74),
       destructive: "#fa7b7b",
       success: "#54c99b",
-      focusRing: mixColors(primary, "#ffffff", 0.34),
+      focusRing: accessibleFocusRing(darkBackground, mixColors(primary, "#ffffff", 0.34)),
     },
   }
 }
@@ -180,7 +184,7 @@ const recipeStyle = (preset: (typeof STYLE_PRESETS)[number]): PresetStyle => {
   return { ...DEFAULT_STYLE, ...typographyStyle(recipe.typography), density, baseSpacing: recipe.density === "spacious" ? 6 : recipe.density === "compact" ? 3 : 4, radius,
     shadow: recipe.surface === "flat" || recipe.surface === "outlined" ? "none" : recipe.surface === "raised" || recipe.surface === "layered" ? "medium" : "soft",
     borderWidth: recipe.geometry === "square" && recipe.contrast === "high" ? 2 : recipe.surface === "flat" ? 0 : 1,
-    contentWidth: recipe.layout === "document" ? "narrow" : ["workspace", "dense", "mission-control", "canvas", "nodes", "split-pane", "asymmetric"].includes(recipe.layout) ? "wide" : "standard" }
+    contentWidth: recipe.layout === "document" ? "narrow" : ["dashboard", "grid", "bento", "workspace", "dense", "mission-control", "canvas", "nodes", "split-pane", "asymmetric"].includes(recipe.layout) ? "wide" : "standard" }
 }
 
 export function createThemeFromPreset(preset = "minimalism"): ThemeConfig {
@@ -213,15 +217,24 @@ export function isThemeConfig(value: unknown): value is ThemeConfig {
     validPalette(theme.light) && validPalette(theme.dark)
 }
 
+function enforceAccessibleTheme(theme: ThemeConfig): ThemeConfig {
+  const normalizePalette = (palette: SemanticPalette): SemanticPalette => ({
+    ...palette,
+    primaryForeground: bestContrastingColor(palette.primary),
+    focusRing: accessibleFocusRing(palette.background, palette.focusRing),
+  })
+  return { ...theme, light: normalizePalette(theme.light), dark: normalizePalette(theme.dark) }
+}
+
 export function migrateThemeConfig(value: unknown): ThemeConfig | null {
-  if (isThemeConfig(value)) return value
+  if (isThemeConfig(value)) return enforceAccessibleTheme(value)
   if (!value || typeof value !== "object" || ![1, 2].includes(Number((value as { version?: unknown }).version))) return null
   const legacy = value as Record<string, unknown>
   const candidate = { ...DEFAULT_STYLE, ...legacy, version: THEME_VERSION,
     preset: resolveStylePresetId(String(legacy.preset ?? "minimalism")),
     headingFont: typeof legacy.headingFont === "string" ? legacy.headingFont : DEFAULT_HEADING_FONT,
     bodyFont: typeof legacy.bodyFont === "string" ? legacy.bodyFont : DEFAULT_BODY_FONT } as ThemeConfig
-  return isThemeConfig(candidate) ? candidate : null
+  return isThemeConfig(candidate) ? enforceAccessibleTheme(candidate) : null
 }
 
 export function loadTheme(storage: Pick<Storage, "getItem"> | null = typeof localStorage === "undefined" ? null : localStorage): ThemeConfig {
@@ -253,7 +266,7 @@ export function themeVariables(theme: ThemeConfig, mode: ThemeMode): Record<stri
   const definition = getStylePreset(theme.preset) ?? STYLE_PRESETS[0]
   const semantic = Object.fromEntries(PALETTE_KEYS.map((key) => [`${kebab(key)}`, palette[key]]))
   const shadow = { none: "none", soft: "0 2px 10px rgb(0 0 0 / 0.08)", medium: "0 8px 24px rgb(0 0 0 / 0.14)", strong: "0 14px 40px rgb(0 0 0 / 0.24)" }[theme.shadow]
-  const contentMax = { narrow: "720px", standard: "1120px", wide: "1440px" }[theme.contentWidth]
+  const contentMax = { narrow: "960px", standard: "1200px", wide: "1540px" }[theme.contentWidth]
   return {
     ...semantic,
     ...spacingScale(theme.baseSpacing, theme.density),
@@ -261,6 +274,7 @@ export function themeVariables(theme: ThemeConfig, mode: ThemeMode): Record<stri
     bg: palette.background, surface: palette.surface, ink: palette.foreground,
     muted: palette.mutedForeground, line: palette.border, accent: palette.primary,
     "accent-light": palette.secondary, danger: palette.destructive,
+    "destructive-foreground": bestContrastingColor(palette.destructive),
     radius: `${theme.radius}px`, "radius-sm": `${Math.max(0, theme.radius - 4)}px`,
     "radius-md": `${theme.radius}px`, "radius-lg": `${theme.radius + 4}px`, "radius-xl": `${theme.radius + 8}px`,
     shadow, "shadow-card": shadow, "border-width": `${theme.borderWidth}px`,
@@ -278,16 +292,25 @@ export function themeVariables(theme: ThemeConfig, mode: ThemeMode): Record<stri
     "section-gap": `var(--space-${theme.density === "compact" ? 8 : 12})`,
     "control-height": theme.density === "compact" ? "34px" : theme.density === "comfortable" ? "46px" : "40px",
     "control-padding-x": `var(--space-${theme.density === "compact" ? 3 : 4})`,
+    "specimen-bar-height": theme.density === "compact" ? "34px" : theme.density === "comfortable" ? "44px" : "39px",
+    "table-cell-padding-y": `var(--space-${theme.density === "compact" ? 2 : theme.density === "comfortable" ? 4 : 3})`,
+    "card-min-height": theme.density === "compact" ? "190px" : theme.density === "comfortable" ? "265px" : "235px",
+    "section-heading-gap": `var(--space-${theme.density === "compact" ? 3 : theme.density === "comfortable" ? 6 : 4})`,
     "radius-control": `${theme.radius}px`, "radius-surface": `${theme.radius + 4}px`, "radius-full": "999px",
     "motion-fast": "150ms", "motion-base": "240ms",
   }
 }
 
 export function applyTheme(theme: ThemeConfig, mode: ThemeMode, target: HTMLElement): void {
-  for (const [name, value] of Object.entries(themeVariables(theme, mode))) target.style.setProperty(`--${name}`, value)
+  const variables = themeVariables(theme, mode)
+  for (const [name, value] of Object.entries(variables)) {
+    target.style.setProperty(`--${name}`, value)
+    target.ownerDocument.documentElement.style.setProperty(`--${name}`, value)
+  }
   target.dataset.themeMode = mode
   target.dataset.density = theme.density
   target.dataset.themeDensity = theme.density
+  target.ownerDocument.documentElement.dataset.themeMode = mode
 }
 
 function cssBlock(selector: string, variables: Record<string, string>): string {

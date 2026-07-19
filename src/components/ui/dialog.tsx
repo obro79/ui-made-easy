@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useId,
@@ -10,6 +11,7 @@ import {
   type ReactNode,
 } from "react"
 import { X } from "lucide-react"
+import { createPortal } from "react-dom"
 import { cn } from "../../lib/utils"
 
 type DialogContextValue = {
@@ -39,16 +41,18 @@ export function Dialog({ children, open: controlledOpen, defaultOpen = false, on
   const titleId = useId()
   const descriptionId = useId()
   const triggerRef = useRef<HTMLButtonElement>(null)
-  const setOpen = (next: boolean) => {
+  const onOpenChangeRef = useRef(onOpenChange)
+  useEffect(() => { onOpenChangeRef.current = onOpenChange }, [onOpenChange])
+  const setOpen = useCallback((next: boolean) => {
     if (controlledOpen === undefined) setInternalOpen(next)
-    onOpenChange?.(next)
-  }
+    onOpenChangeRef.current?.(next)
+  }, [controlledOpen])
   return <DialogContext.Provider value={{ open, setOpen, titleId, descriptionId, triggerRef }}><div className="ui-dialog-root">{children}</div></DialogContext.Provider>
 }
 
-export function DialogTrigger({ onClick, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
+export function DialogTrigger({ className, onClick, type = "button", ...props }: ButtonHTMLAttributes<HTMLButtonElement>) {
   const { open, setOpen, triggerRef } = useDialog()
-  return <button ref={triggerRef} type="button" className={cn("ui-dialog-trigger", props.className)} aria-haspopup="dialog" aria-expanded={open} onClick={(event) => { onClick?.(event); if (!event.defaultPrevented) setOpen(true) }} {...props} />
+  return <button {...props} ref={triggerRef} type={type} className={cn("ui-dialog-trigger", className)} aria-haspopup="dialog" aria-expanded={open} onClick={(event) => { onClick?.(event); if (!event.defaultPrevented) setOpen(true) }} />
 }
 
 export function DialogContent({ children, className, ...props }: HTMLAttributes<HTMLDivElement>) {
@@ -58,6 +62,8 @@ export function DialogContent({ children, className, ...props }: HTMLAttributes<
   useEffect(() => {
     if (!open) return
     const previous = document.activeElement as HTMLElement | null
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
     const frame = requestAnimationFrame(() => {
       const focusable = contentRef.current?.querySelector<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
       ;(focusable ?? contentRef.current)?.focus()
@@ -75,19 +81,20 @@ export function DialogContent({ children, className, ...props }: HTMLAttributes<
     document.addEventListener("keydown", onKeyDown)
     return () => {
       cancelAnimationFrame(frame)
+      document.body.style.overflow = previousOverflow
       document.removeEventListener("keydown", onKeyDown)
       ;(triggerRef.current ?? previous)?.focus()
     }
   }, [open, setOpen, triggerRef])
 
   if (!open) return null
-  return <div className="ui-dialog-layer">
+  return createPortal(<div className="ui-dialog-layer">
     <div className="ui-dialog-overlay" aria-hidden="true" onMouseDown={() => setOpen(false)} />
     <div ref={contentRef} role="dialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId} tabIndex={-1} className={cn("ui-dialog-content", className)} {...props}>
       {children}
       <button type="button" className="ui-dialog-close" aria-label="Close dialog" onClick={() => setOpen(false)}><X aria-hidden="true" size={16} /></button>
     </div>
-  </div>
+  </div>, triggerRef.current?.closest(".app.theme-scope") ?? document.body)
 }
 
 export function DialogHeader(props: HTMLAttributes<HTMLDivElement>) { return <div {...props} className={cn("ui-dialog-header", props.className)} /> }

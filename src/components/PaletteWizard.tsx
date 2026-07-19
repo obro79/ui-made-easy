@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Check, Copy, Lock, Shuffle, Unlock } from "lucide-react"
 import {
+  accessibleFocusRing,
   bestContrastingColor,
   generatePalette,
   getContrastRatio,
@@ -32,11 +33,11 @@ const fields: Array<{ key: keyof Palette; label: string; hint: string }> = [
 ]
 
 const EXAMPLE_PALETTE: Palette = {
-  primary: "#4f3130",
-  secondary: "#753742",
-  background: "#aa5042",
-  surface: "#d8bd8a",
-  foreground: "#d8d78f",
+  primary: "#753742",
+  secondary: "#d8bd8a",
+  background: "#f4efe4",
+  surface: "#fffaf0",
+  foreground: "#4f3130",
 }
 
 const emptyLocks = (): Record<keyof Palette, boolean> => ({
@@ -81,7 +82,7 @@ function buildTheme(config: ThemeConfig, colors: Palette): ThemeConfig {
       primaryForeground: bestContrastingColor(colors.primary),
       mutedForeground: mixColors(colors.foreground, colors.background, 0.42),
       border: mixColors(colors.foreground, colors.background, 0.82),
-      focusRing: mixColors(colors.primary, "#ffffff", 0.18),
+      focusRing: accessibleFocusRing(colors.background, mixColors(colors.primary, "#ffffff", 0.18)),
     },
     dark: {
       ...generated.dark,
@@ -116,6 +117,7 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
     { label: "Text on surface", ratio: getContrastRatio(selected.foreground, selected.surface) },
     { label: "Primary action", ratio: getContrastRatio(bestContrastingColor(selected.primary), selected.primary) },
   ], [selected])
+  const canApply = checks.every((check) => check.ratio >= 4.5)
 
   const setPalette = (palette: Palette) => {
     setSelected(palette)
@@ -125,7 +127,11 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
 
   const randomize = () => {
     const next = { ...selected }
-    for (const { key } of fields) if (!locked[key]) next[key] = randomColor()
+    if (!locked.primary) next.primary = randomColor()
+    if (!locked.secondary) next.secondary = randomColor()
+    if (!locked.background) next.background = mixColors(next.primary, "#ffffff", 0.94)
+    if (!locked.surface) next.surface = mixColors(next.secondary, "#ffffff", 0.96)
+    if (!locked.foreground) next.foreground = bestContrastingColor(next.background)
     setPalette(next)
   }
 
@@ -167,6 +173,10 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
   }
 
   const apply = () => {
+    if (!canApply) {
+      setStatus("Adjust the low-contrast colors before applying this palette")
+      return
+    }
     const nextConfig = buildTheme(config, selected)
     lastAppliedSignature.current = paletteSignature(currentPalette(nextConfig))
     onChange(nextConfig)
@@ -232,7 +242,7 @@ export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
         })}
       </div>
 
-      <button className="palette-wizard__apply" type="button" onClick={apply}>Apply palette</button>
+      <button className="palette-wizard__apply" type="button" onClick={apply} disabled={!canApply}>Apply palette</button>
 
       <div className="palette-wizard__contrast" role="group" aria-label="Contrast summary">
         {checks.map((check) => (

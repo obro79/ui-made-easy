@@ -1,23 +1,94 @@
-/* Live design-system controls. Kept after preset CSS so explicit user choices win. */
-.app.theme-scope main{max-width:var(--content-max,1120px);font-size:var(--text-base,14px);line-height:var(--line-body,1.55)}
-.app.theme-scope :is(h1,h2,h3,h4,.card-title){font-family:var(--font-heading);font-weight:var(--heading-weight,700);letter-spacing:var(--heading-tracking,-.035em)}
-.app.theme-scope header>div>h1{font-size:clamp(38px,5vw,var(--text-display,58px))}
-.app.theme-scope .section-heading h2{font-size:var(--text-title,28px)}
-.app.theme-scope :is(p,label,input,select,button,td){font-size:inherit}
-.app.theme-scope :is(.card,.specimen,.ui-dialog-content,.ui-alert-dialog-content,.ui-empty,.ui-skeleton-card){border-width:var(--border-width,1px);border-radius:var(--radius-lg,12px);box-shadow:var(--shadow-card,var(--shadow))}
-.app.theme-scope :is(.button,input,select,.menu,.ui-tabs-list,.ui-tabs-trigger,.ui-pagination-link,.ui-alert,.ui-popover-content,.ui-accordion-item,.customizer-drawer){border-radius:var(--radius-md,8px)}
-.app.theme-scope :is(input,select,.button,.ui-tabs-list,.ui-pagination-link,.ui-alert,.ui-popover-content){border-width:var(--border-width,1px)}
-.app.theme-scope .badge{border-radius:calc(var(--radius,8px) * 3)}
-.app.theme-scope .switch input,.app.theme-scope .ui-progress-track{border-radius:calc(var(--radius,8px) * 3)}
-.app.theme-scope :is(.specimen-content,.card-header,.ui-dialog-content,.ui-alert-dialog-content,.ui-empty){padding:var(--surface-padding,24px)}
-.app.theme-scope :is(.foundation-grid,.two-col,.card-grid,.row,.form-stack,.ui-alert,.ui-dialog-footer,.ui-alert-dialog-footer){gap:var(--layout-gap,16px)}
-.app.theme-scope :is(.button,input:not([type="color"]),select){min-height:var(--control-height,40px)}
-.app.theme-scope .button{padding-inline:var(--control-padding-x,16px)}
-.app.theme-scope :is(.button,input,select,.menu,.ui-alert,.ui-popover-content,.ui-dialog-content,.ui-alert-dialog-content){border-color:var(--border,var(--line));color:var(--foreground,var(--ink))}
-.app.theme-scope :is(.button-default,.ui-alert-dialog-action){color:var(--primary-foreground,#fff);background:var(--primary,var(--accent))}
-.app.theme-scope :is(button,a,input,select):focus-visible{outline-color:var(--focus-ring,var(--accent))}
-.appearance-controls .segmented-control{grid-template-columns:repeat(4,minmax(0,1fr))}
-.appearance-controls .control-label{display:block;margin-top:14px;color:var(--foreground,var(--ink));font-size:12px;font-weight:700}
-.appearance-controls .range-field+.control-label{margin-top:18px}
-.customizer-value{color:var(--muted-foreground,var(--muted));font-family:'DM Mono',monospace;font-weight:600}
-@media(max-width:600px){.appearance-controls .segmented-control{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Final token contract. This file is loaded after preset recipes so explicit
+   user choices and shared density roles remain authoritative everywhere. */
+.app.theme-scope > main {
+  max-width: min(var(--content-max, 1200px), calc(100vw - 248px));
+  font-size: var(--text-base, 14px);
+  line-height: var(--line-body, 1.55);
+}
+
+.app.theme-scope :is(h1,h2,h3,h4,.card-title) {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight, 700);
+  letter-spacing: var(--heading-tracking, -.035em);
+}
+
+.app.theme-scope .page-hero .hero-copy > h1 { font-size: clamp(38px, 5vw, var(--text-display, 58px)); }
+.app.theme-scope .section-heading h2 { font-size: var(--text-title, 28px); }
+
+.app.theme-scope .specimen-content,
+.app.theme-scope :is(.ui-dialog-content,.ui-alert-dialog-content,.ui-empty) { padding: var(--surface-padding, 24px); }
+.app.theme-scope .card-header { padding: var(--surface-padding) var(--surface-padding) calc(var(--surface-padding) * .5); }
+.app.theme-scope .card-content { padding-inline: var(--surface-padding); }
+.app.theme-scope .card-footer { padding: calc(var(--surface-padding) * .5) var(--surface-padding) var(--surface-padding); }
+
+.app.theme-scope :is(.foundation-grid,.two-col,.card-grid,.row,.form-stack,.extended-stack,.progress-stack,.alert-stack,.ui-alert,.ui-dialog-footer,.ui-alert-dialog-footer) {
+  gap: var(--layout-gap, 16px);
+}
+.app.theme-scope :is(.foundation-grid,.two-col,.card-grid) > * { min-width: 0; }
+
+.app.theme-scope :is(input:not([type="color"]):not([type="range"]),select) { min-height: var(--control-height, 40px); }
+.app.theme-scope .button { padding-inline: var(--control-padding-x, 16px); }
+.app.theme-scope .button-size-sm {
+  height: calc(var(--control-height, 40px) - 8px) !important;
+  min-height: calc(var(--control-height, 40px) - 8px) !important;
+  padding-inline: calc(var(--control-padding-x, 16px) * .75);
+  font-size: var(--text-sm, 12px);
+}
+.app.theme-scope .button-size-default {
+  height: var(--control-height, 40px) !important;
+  min-height: var(--control-height, 40px) !important;
+  font-size: var(--text-base, 14px);
+}
+.app.theme-scope .button-size-lg {
+  height: calc(var(--control-height, 40px) + 8px) !important;
+  min-height: calc(var(--control-height, 40px) + 8px) !important;
+  padding-inline: calc(var(--control-padding-x, 16px) * 1.25);
+  font-size: var(--text-lg, 17px);
+}
+
+.app.theme-scope :is(input,select,.menu,.ui-alert,.ui-popover-content,.ui-dialog-content,.ui-alert-dialog-content) {
+  border-color: var(--border, var(--line));
+  color: var(--foreground, var(--ink));
+}
+.app.theme-scope .button-default {
+  color: var(--primary-foreground, #fff);
+  background: var(--primary, var(--accent));
+}
+.app.theme-scope :is(.button-destructive,.ui-alert-dialog-action) { color: var(--destructive-foreground, #fff); background: var(--destructive, var(--danger)); }
+.app.theme-scope :is(button,a,input,select):focus-visible { outline-color: var(--focus-ring, var(--accent)); }
+
+/* Geometry controls intentionally win only after the user changes that axis;
+   untouched presets retain their more characteristic shapes and surfaces. */
+.app.theme-scope[data-radius-overridden="true"] :is(.card,.specimen,.ui-dialog-content,.ui-alert-dialog-content,.ui-empty,.ui-skeleton-card) {
+  border-radius: var(--radius-surface, 12px);
+  clip-path: none;
+}
+.app.theme-scope[data-radius-overridden="true"] :is(.button,input,select,.menu,.ui-tabs-list,.ui-tabs-trigger,.ui-pagination-link,.ui-alert,.ui-popover-content,.ui-accordion-item) {
+  border-radius: var(--radius-control, 8px);
+  clip-path: none;
+}
+.app.theme-scope[data-border-overridden="true"] :is(.card,.specimen,.button,input,select,.ui-alert,.ui-dialog-content,.ui-alert-dialog-content) {
+  border-style: solid;
+  border-width: var(--border-width, 1px);
+}
+.app.theme-scope[data-shadow-overridden="true"] :is(.card,.specimen,.ui-dialog-content,.ui-alert-dialog-content,.ui-empty,.ui-skeleton-card) {
+  box-shadow: var(--shadow-card, var(--shadow));
+}
+
+.app.theme-scope .badge { border-radius: var(--radius-full, 999px); }
+.app.theme-scope :is(.switch input,.ui-progress-track) { border-radius: var(--radius-full, 999px); }
+.appearance-controls .segmented-control { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.appearance-controls .control-label { display: block; margin-top: var(--space-4, 16px); color: var(--foreground, var(--ink)); font-size: var(--text-sm, 12px); font-weight: 700; }
+.appearance-controls .range-field + .control-label { margin-top: var(--space-5, 20px); }
+.customizer-value { color: var(--muted-foreground, var(--muted)); font-family: var(--font-mono); font-weight: 600; }
+
+@media (max-width: 1180px) and (min-width: 851px) {
+  .app.theme-scope :is(.foundation-grid,.card-grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app.theme-scope[data-style-id="bento-grid"] :is(.foundation-grid,.card-grid) > *,
+  .app.theme-scope[data-style-id="bento-grid"] :is(.foundation-grid,.card-grid) > :first-child { grid-column: span 1; grid-row: auto; }
+  .app.theme-scope .overlay-demo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .appearance-controls .segmented-control { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

@@ -47,6 +47,18 @@ export function StyleSelector({
   const [category, setCategory] = useState<StyleCategory | undefined>()
   const filteredStyles = useMemo(() => searchStylePresets(query, category), [query, category])
   const current = getStylePreset(value)
+  const selectedVisible = filteredStyles.some((style) => style.id === value)
+
+  const navigateOptions = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return
+    const options = [...event.currentTarget.parentElement!.querySelectorAll<HTMLButtonElement>('[role="option"]')]
+    const currentIndex = options.indexOf(event.currentTarget)
+    const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? options.length - 1 :
+      event.key === "ArrowRight" || event.key === "ArrowDown" ? Math.min(options.length - 1, currentIndex + 1) : Math.max(0, currentIndex - 1)
+    options[nextIndex]?.focus()
+    options[nextIndex]?.click()
+    event.preventDefault()
+  }
 
   return (
     <section className={`style-selector ${className}`.trim()} aria-labelledby={labelId}>
@@ -81,7 +93,7 @@ export function StyleSelector({
 
       {filteredStyles.length ? (
         <div className="style-selector__grid" role="listbox" aria-label={label}>
-          {filteredStyles.map((style) => {
+          {filteredStyles.map((style, index) => {
             const selected = style.id === value
             return (
               <button
@@ -89,6 +101,7 @@ export function StyleSelector({
                 type="button"
                 role="option"
                 aria-selected={selected}
+                tabIndex={selected || (!selectedVisible && index === 0) ? 0 : -1}
                 className="style-selector-card"
                 data-selected={selected || undefined}
                 data-style-id={style.id}
@@ -99,6 +112,7 @@ export function StyleSelector({
                 data-decoration={style.recipe.decoration}
                 style={variablesFor(style.id, mode)}
                 onClick={() => onChange(style.id)}
+                onKeyDown={navigateOptions}
               >
                 <StylePreview />
                 <span className="style-selector-card__meta">

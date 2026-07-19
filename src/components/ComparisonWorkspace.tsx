@@ -1,6 +1,6 @@
-import { useEffect, type CSSProperties } from "react"
+import { useEffect, useRef, type CSSProperties } from "react"
+import { createPortal } from "react-dom"
 import { Bell, Copy, Edit3, Plus, Trash2, X } from "lucide-react"
-import type { ThemeMode } from "../theme"
 import { themeVariables } from "../theme"
 import { getStylePreset } from "../presets"
 import type { SavedVariant } from "../variants"
@@ -8,28 +8,27 @@ import "../comparison-workspace.css"
 
 type ComparisonWorkspaceProps = {
   variants: SavedVariant[]
-  mode: ThemeMode
   onEdit: (id: string) => void
   onDuplicate: (id: string) => void
   onRemove: (id: string) => void
   onClose: () => void
 }
 
-function previewStyle(variant: SavedVariant, mode: ThemeMode): CSSProperties {
-  const variables = themeVariables(variant.config, mode)
+function previewStyle(variant: SavedVariant): CSSProperties {
+  const variables = themeVariables(variant.config, variant.previewMode)
   return Object.fromEntries(Object.entries(variables).map(([key, value]) => [`--${key}`, value])) as CSSProperties
 }
 
 function PreviewCanvas() {
   return (
-    <div className="comparison-canvas">
+    <div className="comparison-canvas" aria-hidden="true" inert>
       <header className="comparison-canvas__intro">
         <span className="comparison-eyebrow">Workspace overview</span>
         <h2>Good morning, Owen.</h2>
         <p>Track the details that matter and keep your team moving.</p>
         <div className="comparison-button-row">
-          <button className="comparison-button comparison-button--primary">Create project</button>
-          <button className="comparison-button comparison-button--secondary">View activity</button>
+          <button className="comparison-button comparison-button--primary" tabIndex={-1}>Create project</button>
+          <button className="comparison-button comparison-button--secondary" tabIndex={-1}>View activity</button>
         </div>
       </header>
 
@@ -51,9 +50,9 @@ function PreviewCanvas() {
       <form className="comparison-form" onSubmit={(event) => event.preventDefault()}>
         <label>
           Invite a teammate
-          <input type="email" placeholder="name@company.com" aria-label="Teammate email" />
+          <input type="email" placeholder="name@company.com" aria-label="Teammate email" tabIndex={-1} readOnly />
         </label>
-        <button className="comparison-button comparison-button--primary" type="submit">Send invite</button>
+        <button className="comparison-button comparison-button--primary" type="submit" tabIndex={-1}>Send invite</button>
       </form>
 
       <div className="comparison-table-wrap">
@@ -75,16 +74,40 @@ function PreviewCanvas() {
   )
 }
 
-export function ComparisonWorkspace({ variants, mode, onEdit, onDuplicate, onRemove, onClose }: ComparisonWorkspaceProps) {
+export function ComparisonWorkspace({ variants, onEdit, onDuplicate, onRemove, onClose }: ComparisonWorkspaceProps) {
   const visibleVariants = variants.slice(0, 3)
+  const dialogRef = useRef<HTMLElement>(null)
+  const onCloseRef = useRef(onClose)
+  useEffect(() => { onCloseRef.current = onClose }, [onClose])
   useEffect(() => {
-    const close = (event: KeyboardEvent) => { if (event.key === "Escape") onClose() }
-    document.addEventListener("keydown", close)
-    return () => document.removeEventListener("keydown", close)
-  }, [onClose])
+    const previous = document.activeElement as HTMLElement | null
+    const frame = requestAnimationFrame(() => dialogRef.current?.querySelector<HTMLElement>(".comparison-icon-button")?.focus())
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { event.preventDefault(); onCloseRef.current(); return }
+      if (event.key !== "Tab" || !dialogRef.current) return
+      const items = [...dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]):not([tabindex="-1"]), [href]:not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])')]
+        .filter((item) => !item.closest("[inert]"))
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (!dialogRef.current.contains(document.activeElement)) {
+        event.preventDefault()
+        ;(event.shiftKey ? last : first).focus()
+        return
+      }
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => {
+      cancelAnimationFrame(frame)
+      document.removeEventListener("keydown", onKeyDown)
+      previous?.focus()
+    }
+  }, [])
 
-  return (
-    <section className="comparison-workspace" role="dialog" aria-modal="true" aria-labelledby="comparison-title">
+  return createPortal(
+    <section ref={dialogRef} className="comparison-workspace" role="dialog" aria-modal="true" aria-labelledby="comparison-title">
       <header className="comparison-workspace__header">
         <div>
           <span className="comparison-workspace__kicker">Theme lab</span>
@@ -101,13 +124,13 @@ export function ComparisonWorkspace({ variants, mode, onEdit, onDuplicate, onRem
           {visibleVariants.map((variant) => {
             const preset = getStylePreset(variant.config.preset)!
             return (
-            <article className="comparison-preview theme-scope" key={variant.id} style={previewStyle(variant, mode)} data-theme-mode={mode} data-style-id={preset.id} data-layout={preset.recipe.layout} data-surface={preset.recipe.surface} data-treatment={preset.recipe.typography} data-geometry={preset.recipe.geometry} data-decoration={preset.recipe.decoration}>
+            <article className="comparison-preview theme-scope" key={variant.id} style={previewStyle(variant)} data-theme-mode={variant.previewMode} data-style-id={preset.id} data-layout={preset.recipe.layout} data-surface={preset.recipe.surface} data-treatment={preset.recipe.typography} data-geometry={preset.recipe.geometry} data-decoration={preset.recipe.decoration}>
               <header className="comparison-preview__header">
                 <div className="comparison-preview__identity">
-                  <span className="comparison-swatch" style={{ background: variant.config[mode].primary }} aria-hidden="true" />
+                  <span className="comparison-swatch" style={{ background: variant.config[variant.previewMode].primary }} aria-hidden="true" />
                   <div>
                     <h2>{variant.name}</h2>
-                    <p>{preset.name} · {variant.config.density}</p>
+                    <p>{preset.name} · {variant.config.density} · {variant.previewMode}</p>
                   </div>
                 </div>
                 <div className="comparison-preview__actions" aria-label={`Actions for ${variant.name}`}>
@@ -128,6 +151,7 @@ export function ComparisonWorkspace({ variants, mode, onEdit, onDuplicate, onRem
           <p>Save a theme direction, then add it here to compare.</p>
         </div>
       )}
-    </section>
+    </section>,
+    document.body,
   )
 }

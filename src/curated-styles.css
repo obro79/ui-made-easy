@@ -57,11 +57,11 @@
 }
 
 /* Geometry is a separate recipe axis from typography. */
-.theme-scope[data-geometry="square"] :is(.specimen,.card,.button,input,select,.badge,.comparison-card,.comparison-button,.customizer-inline,.customizer-inline button) { border-radius: 0; }
-.theme-scope[data-geometry="subtle"] :is(.specimen,.card,.button,input,select,.customizer-inline,.customizer-inline button) { border-radius: max(4px, var(--radius-sm)); }
+.theme-scope[data-geometry="square"] :is(.specimen,.card,.button,input,select,.badge,.comparison-card,.comparison-button,.customizer-inline,.customizer-inline button:not(.style-selector-card):not(.font-pair-card)) { border-radius: 0; }
+.theme-scope[data-geometry="subtle"] :is(.specimen,.card,.button,input,select,.customizer-inline,.customizer-inline button:not(.style-selector-card):not(.font-pair-card)) { border-radius: max(4px, var(--radius-sm)); }
 .theme-scope[data-geometry="rounded"] :is(.specimen,.card,.comparison-card,.customizer-inline) { border-radius: max(14px, var(--radius-lg)); }
-.theme-scope[data-geometry="rounded"] :is(.button,input,select,.badge,.comparison-button,.customizer-inline button) { border-radius: max(9px, var(--radius-md)); }
-.theme-scope[data-geometry="pill"] :is(.button,input,select,.badge,.comparison-button,.customizer-inline button) { border-radius: 999px; }
+.theme-scope[data-geometry="rounded"] :is(.button,input,select,.badge,.comparison-button,.customizer-inline button:not(.style-selector-card):not(.font-pair-card)) { border-radius: max(9px, var(--radius-md)); }
+.theme-scope[data-geometry="pill"] :is(.button,input,select,.badge,.comparison-button,.customizer-inline button:not(.style-selector-card):not(.font-pair-card)) { border-radius: 999px; }
 .theme-scope[data-geometry="mixed"] :is(.card,.specimen):nth-child(odd) { border-radius: 3px 22px; }
 .theme-scope[data-geometry="organic"] :is(.card,.specimen,.comparison-card,.customizer-inline) { border-radius: 28px 12px 24px 14px; }
 
@@ -118,7 +118,7 @@
 .theme-scope[data-style-id="linear-inspired"] .hero-copy h1 { font-size: clamp(46px,5vw,72px); }
 .theme-scope[data-style-id="linear-inspired"] .spec-section { display: grid; grid-template-columns: minmax(150px,190px) minmax(0,1fr); gap: var(--space-6,24px); min-height: 0; padding: var(--space-8,32px) 0; border-bottom: 1px solid var(--line); }
 .theme-scope[data-style-id="linear-inspired"] .section-heading { display: block; padding: var(--space-1,4px) 0; margin: 0; border: 0; }
-.theme-scope[data-style-id="linear-inspired"] .spec-section > :not(.section-heading) { margin: 0; align-self: start; }
+.theme-scope[data-style-id="linear-inspired"] .spec-section > :not(.section-heading) { grid-column: 2; min-width: 0; margin: 0; align-self: start; }
 .theme-scope[data-style-id="linear-inspired"] :is(.specimen,.card,.comparison-card) { border-color: color-mix(in srgb,var(--line) 78%,transparent); box-shadow: inset 0 1px rgb(255 255 255 / .04),0 8px 24px rgb(0 0 0 / .08); }
 .theme-scope[data-style-id="linear-inspired"] :is(.card,.specimen):hover { transform: none; border-color: color-mix(in srgb,var(--accent) 48%,var(--line)); }
 .theme-scope[data-style-id="linear-inspired"] :is(.button,input,select):focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb,var(--accent) 24%,transparent); }
@@ -141,7 +141,8 @@
 .theme-scope[data-style-id="bento-grid"] :is(.foundation-grid,.card-grid) { grid-template-columns: repeat(6,minmax(0,1fr)); grid-auto-flow: dense; align-items: stretch; }
 .theme-scope[data-style-id="bento-grid"] :is(.foundation-grid,.card-grid) > * { grid-column: span 2; }
 .theme-scope[data-style-id="bento-grid"] :is(.foundation-grid,.card-grid) > :first-child { grid-column: span 4; grid-row: span 2; }
-.theme-scope[data-style-id="bento-grid"] :is(.specimen,.card) { min-height: 210px; border: 0; box-shadow: 0 12px 34px rgb(0 0 0 / .1); }
+.theme-scope[data-style-id="bento-grid"] :is(.foundation-grid > :first-child,.card-grid > :first-child) { min-height: 210px; }
+.theme-scope[data-style-id="bento-grid"] :is(.specimen,.card) { border: 0; box-shadow: 0 12px 34px rgb(0 0 0 / .1); }
 .theme-scope[data-style-id="bento-grid"] :is(.specimen,.card):hover { transform: translateY(-3px); }
 
 /* 08 — Cinematic Mission Control */
@@ -201,7 +202,8 @@
 .theme-scope[data-style-id="liquid-glass"] main { max-width: 1460px; }
 .theme-scope[data-style-id="liquid-glass"] .page-hero { padding: calc(var(--space-8,32px) + var(--space-2,8px)); border: 1px solid color-mix(in srgb,white 44%,var(--line)); border-radius: 32px 14px 28px 18px; background: color-mix(in srgb,var(--surface) 66%,transparent); backdrop-filter: blur(24px) saturate(1.3); box-shadow: inset 0 1px rgb(255 255 255 / .65),0 24px 70px rgb(23 37 84 / .15); }
 .theme-scope[data-style-id="liquid-glass"] :is(.specimen,.card,.comparison-card) { position: relative; isolation: isolate; overflow: hidden; background: color-mix(in srgb,var(--surface) 68%,transparent); backdrop-filter: blur(22px) saturate(1.28); box-shadow: inset 0 1px 1px rgb(255 255 255 / .55),0 20px 55px rgb(30 64 175 / .13); }
-.theme-scope[data-style-id="liquid-glass"] :is(.specimen,.card)::after { inset: 1px; background: linear-gradient(135deg,rgb(255 255 255 / .24),transparent 36% 72%,rgb(255 255 255 / .12)); box-shadow: inset 0 1px 1px rgb(255 255 255 / .55); }
+.theme-scope[data-style-id="liquid-glass"] :is(.specimen,.card)::after { z-index: 0; inset: 1px; background: linear-gradient(118deg,rgb(255 255 255 / .34),transparent 28% 66%,rgb(255 255 255 / .14)); box-shadow: inset 0 1px 1px rgb(255 255 255 / .55); animation: liquid-specular 9s ease-in-out infinite alternate; }
+.theme-scope[data-style-id="liquid-glass"] :is(.specimen,.card) > * { position: relative; z-index: 1; }
 .theme-scope[data-style-id="liquid-glass"] .specimen-bar { background: linear-gradient(135deg,color-mix(in srgb,var(--surface) 62%,white),color-mix(in srgb,var(--accent) 10%,var(--surface))); color: var(--ink); }
 .theme-scope[data-style-id="liquid-glass"] .button-default { background: color-mix(in srgb,var(--accent) 82%,transparent); color: var(--primary-foreground); backdrop-filter: blur(10px); }
 
@@ -215,6 +217,9 @@
 .theme-scope[data-style-id="monochrome-dark"] { filter: none; }
 .theme-scope[data-style-id="monochrome-dark"] main { max-width: none; }
 .theme-scope[data-style-id="monochrome-dark"] .page-hero { padding: var(--space-8,32px); border: 1px solid var(--line); background: var(--surface); }
+.theme-scope[data-style-id="monochrome-dark"] .spec-section { min-height: 0; grid-template-columns: minmax(160px,220px) minmax(0,1fr); }
+.theme-scope[data-style-id="monochrome-dark"] .section-heading { padding: var(--space-6,24px); }
+.theme-scope[data-style-id="monochrome-dark"] .spec-section > :not(.section-heading) { margin: var(--space-6,24px); }
 .theme-scope[data-style-id="monochrome-dark"] :is(.specimen,.card,.comparison-card) { background: color-mix(in srgb,var(--surface) 94%,var(--bg)); border-color: var(--line); box-shadow: none; }
 .theme-scope[data-style-id="monochrome-dark"] :is(.specimen-bar,thead,.comparison-alert) { background: color-mix(in srgb,var(--surface) 72%,var(--bg)); }
 .theme-scope[data-style-id="monochrome-dark"] .button-default { background: var(--ink); color: var(--bg); }
@@ -227,11 +232,11 @@
 .theme-scope[data-style-id="neo-brutalism"] .hero-copy h1 { max-width: 11ch; font-size: clamp(60px,8vw,108px); text-transform: uppercase; }
 .theme-scope[data-style-id="neo-brutalism"] :is(.specimen,.card,.comparison-card,.customizer-inline) { border: 3px solid var(--ink); background: var(--surface); box-shadow: 7px 7px 0 var(--ink); }
 .theme-scope[data-style-id="neo-brutalism"] :is(.button,.comparison-button) { border: 2px solid var(--ink); border-radius: 0; font-weight: 800; text-transform: uppercase; box-shadow: 4px 4px 0 var(--ink); }
-.theme-scope[data-style-id="neo-brutalism"] .customizer-inline button { border: 2px solid var(--ink); border-radius: 0; font-weight: 800; text-transform: uppercase; }
+.theme-scope[data-style-id="neo-brutalism"] .customizer-inline button:not(.style-selector-card):not(.font-pair-card) { border: 2px solid var(--ink); border-radius: 0; font-weight: 800; text-transform: uppercase; }
 .theme-scope[data-style-id="neo-brutalism"] .customizer-inline :is(.palette-wizard__toolbar button,.palette-wizard__apply,.customizer-footer .button) { box-shadow: 4px 4px 0 var(--ink); }
 .theme-scope[data-style-id="neo-brutalism"] .customizer-inline .customizer-tabs { gap: 6px; }
 .theme-scope[data-style-id="neo-brutalism"] .customizer-inline .customizer-tab { min-height: 40px; padding-inline: 2px; border-width: 0 0 3px; box-shadow: none; font-size: .58rem; letter-spacing: -.02em; }
-.theme-scope[data-style-id="neo-brutalism"] :is(.button,.comparison-button,.customizer-inline button):active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--ink); }
+.theme-scope[data-style-id="neo-brutalism"] :is(.button,.comparison-button,.customizer-inline button:not(.style-selector-card):not(.font-pair-card)):active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--ink); }
 .theme-scope[data-style-id="neo-brutalism"] :is(.specimen-bar,.badge,th) { text-transform: uppercase; }
 
 /* 17 — Collage / Scrapbook */
@@ -240,15 +245,21 @@
 .theme-scope[data-style-id="collage-scrapbook"] .hero-toolbar { justify-content: flex-start; max-width: none; }
 .theme-scope[data-style-id="collage-scrapbook"] .hero-copy h1 { max-width: 12ch; font-size: clamp(60px,8vw,106px); }
 .theme-scope[data-style-id="collage-scrapbook"] .section-heading h2 { display: inline; padding: var(--space-1,4px) var(--space-3,12px); background: var(--ink); color: var(--bg); box-decoration-break: clone; }
+.theme-scope[data-style-id="collage-scrapbook"] .section-heading::after { content: "CUT / KEEP"; margin-left: auto; padding: 4px 8px; border: 1px dashed var(--ink); color: var(--ink); font: 700 var(--text-xs,11px) var(--font-mono); transform: rotate(2deg); }
+.theme-scope[data-style-id="collage-scrapbook"] .spec-section { border-bottom: 2px dashed color-mix(in srgb,var(--ink) 26%,transparent); }
+.theme-scope[data-style-id="collage-scrapbook"] .specimen-bar { background: color-mix(in srgb,var(--accent) 10%,#fff5df); border-bottom-style: dashed; font-family: var(--font-mono); }
+.theme-scope[data-style-id="collage-scrapbook"] .spec-section > .specimen { position: relative; transform: rotate(.18deg); }
+.theme-scope[data-style-id="collage-scrapbook"] .spec-section > .specimen::before { content: ""; position: absolute; z-index: 2; top: -9px; left: 12%; width: 58px; height: 18px; background: rgb(239 216 151 / .7); transform: rotate(2deg); pointer-events: none; }
 .theme-scope[data-style-id="collage-scrapbook"] :is(.card,.foundation-grid > .specimen) { position: relative; background: color-mix(in srgb,var(--surface) 94%,#efdcae); box-shadow: 6px 8px 18px rgb(0 0 0 / .12); }
 .theme-scope[data-style-id="collage-scrapbook"] :is(.card,.foundation-grid > .specimen)::before { content: ""; position: absolute; z-index: 2; top: -8px; left: 38%; width: 52px; height: 18px; background: rgb(239 216 151 / .72); transform: rotate(-3deg); }
 .theme-scope[data-style-id="collage-scrapbook"] :is(.form-stack,.table-wrap,.ui-tabs,.ui-accordion) { transform: none; }
 
 /* 18 — Retrofuturism */
 .theme-scope[data-style-id="retrofuturism"] main { max-width: none; }
-.theme-scope[data-style-id="retrofuturism"] .page-hero { padding: var(--space-8,32px); border: 1px solid var(--accent); clip-path: polygon(0 0,calc(100% - 28px) 0,100% 28px,100% 100%,28px 100%,0 calc(100% - 28px)); background: linear-gradient(145deg,color-mix(in srgb,var(--surface) 92%,transparent),color-mix(in srgb,var(--accent) 12%,var(--surface))); }
+.theme-scope[data-style-id="retrofuturism"] .page-hero { position: relative; isolation: isolate; overflow: hidden; padding: var(--space-8,32px); border: 1px solid var(--accent); border-radius: 44px 10px 44px 10px; clip-path: none; background: radial-gradient(circle at 88% 20%,color-mix(in srgb,var(--accent) 28%,transparent),transparent 28%),linear-gradient(145deg,color-mix(in srgb,var(--surface) 92%,transparent),color-mix(in srgb,var(--accent) 12%,var(--surface))); }
+.theme-scope[data-style-id="retrofuturism"] .page-hero::after { content: ""; position: absolute; z-index: -1; right: 4%; top: 12%; width: 240px; aspect-ratio: 1.8; border: 2px solid color-mix(in srgb,var(--accent) 62%,transparent); border-radius: 50%; box-shadow: 0 0 0 18px color-mix(in srgb,var(--accent) 8%,transparent),inset 0 0 40px color-mix(in srgb,var(--accent) 12%,transparent); transform: rotate(-18deg); }
 .theme-scope[data-style-id="retrofuturism"] .hero-copy h1 { max-width: 15ch; font-size: clamp(54px,6vw,88px); font-style: italic; text-transform: uppercase; text-shadow: 3px 3px 0 color-mix(in srgb,var(--accent) 46%,transparent); }
-.theme-scope[data-style-id="retrofuturism"] :is(.specimen,.card,.comparison-card) { border-color: color-mix(in srgb,var(--accent) 48%,var(--line)); clip-path: polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px)); }
+.theme-scope[data-style-id="retrofuturism"] :is(.specimen,.card,.comparison-card) { border-color: color-mix(in srgb,var(--accent) 48%,var(--line)); border-radius: 22px 5px 22px 5px; clip-path: none; }
 .theme-scope[data-style-id="retrofuturism"] :is(.badge,.button-default,.specimen-bar) { background: linear-gradient(180deg,color-mix(in srgb,white 88%,var(--accent)),color-mix(in srgb,var(--accent) 30%,#64748b) 48%,color-mix(in srgb,white 70%,var(--accent))); color: #111; }
 .theme-scope[data-style-id="retrofuturism"] :is(.eyebrow,th) { letter-spacing: .16em; }
 
@@ -274,6 +285,7 @@
   border-right: 0;
 }
 .theme-scope[data-style-id="terminal"] .spec-section > :not(.section-heading) {
+  grid-column: 2;
   min-width: 0;
   align-self: start;
   margin: 0;
@@ -286,6 +298,7 @@
 @media (max-width: 1050px) {
   .theme-scope[data-style-id="terminal"] .spec-section { grid-template-columns: 1fr; gap: var(--space-4,16px); }
   .theme-scope[data-style-id="terminal"] .section-heading { padding-bottom: var(--space-3,12px); border-bottom: 1px solid var(--line); }
+  .theme-scope[data-style-id="terminal"] .spec-section > :not(.section-heading) { grid-column: 1; }
 }
 
 /* 20 — Material 3-inspired */
@@ -293,9 +306,9 @@
 .theme-scope[data-style-id="material-3-inspired"] .page-hero { padding: clamp(var(--space-8,32px),5vw,calc(var(--space-12,48px) + var(--space-2,8px))); border-radius: 28px; background: var(--accent-light); }
 .theme-scope[data-style-id="material-3-inspired"] .hero-copy h1 { max-width: 12ch; font-size: clamp(54px,6vw,86px); }
 .theme-scope[data-style-id="material-3-inspired"] :is(.specimen,.card,.comparison-card) { border: 0; border-radius: 20px; background: color-mix(in srgb,var(--surface) 78%,var(--accent-light)); box-shadow: 0 1px 2px rgb(0 0 0 / .08),0 5px 15px rgb(0 0 0 / .06); }
-.theme-scope[data-style-id="material-3-inspired"] :is(.button,.badge,.comparison-button,.customizer-inline button) { min-height: 44px; border-radius: 999px; letter-spacing: .01em; text-transform: none; }
+.theme-scope[data-style-id="material-3-inspired"] :is(.button,.badge,.comparison-button,.customizer-inline button:not(.style-selector-card):not(.font-pair-card)) { min-height: 44px; border-radius: 999px; letter-spacing: .01em; text-transform: none; }
 .theme-scope[data-style-id="material-3-inspired"] .button-secondary { background: color-mix(in srgb,var(--accent) 16%,var(--surface)); }
-.theme-scope[data-style-id="material-3-inspired"] :is(.button,.comparison-button,.customizer-inline button):hover { box-shadow: inset 0 0 0 999px rgb(0 0 0 / .05); }
+.theme-scope[data-style-id="material-3-inspired"] :is(.button,.comparison-button,.customizer-inline button:not(.style-selector-card):not(.font-pair-card)):hover { box-shadow: inset 0 0 0 999px rgb(0 0 0 / .05); }
 .theme-scope[data-style-id="material-3-inspired"] :is(input:not([type="range"]):not([type="color"]),select) { min-height: 48px; border-radius: 12px 12px 0 0; background: color-mix(in srgb,var(--accent-light) 58%,var(--surface)); }
 
 /* Selector thumbnails mirror the same high-signal DNA without applying the
@@ -329,6 +342,7 @@
 .style-selector-card[data-style-id="material-3-inspired"] .style-selector-preview { border-radius: 18px; background: #eee9f6; box-shadow: 0 3px 8px rgb(0 0 0 / .1); }
 
 @keyframes curated-cursor { 50% { opacity: 0; } }
+@keyframes liquid-specular { from { transform: translate3d(-4%,-2%,0); opacity: .72; } to { transform: translate3d(4%,2%,0); opacity: 1; } }
 
 @media (max-width: 1180px) {
   .app.theme-scope .page-hero { grid-template-columns: minmax(0,1fr); align-items: start; }
@@ -349,6 +363,8 @@
   .theme-scope[data-style-id="editorial"] .hero-copy .eyebrow { grid-column: auto; }
   .theme-scope[data-style-id="editorial"] .hero-copy .lede { max-width: 42ch; }
   .theme-scope[data-style-id="linear-inspired"] .spec-section { grid-template-columns: 1fr; }
+  .theme-scope[data-style-id="linear-inspired"] .spec-section > :not(.section-heading),
+  .theme-scope[data-style-id="terminal"] .spec-section > :not(.section-heading) { grid-column: 1; }
   .theme-scope[data-style-id="bento-grid"] :is(.foundation-grid,.card-grid) { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .theme-scope[data-style-id="bento-grid"] :is(.foundation-grid,.card-grid) > *,
   .theme-scope[data-style-id="bento-grid"] :is(.foundation-grid,.card-grid) > :first-child { grid-column: span 1; grid-row: auto; }
@@ -375,7 +391,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .theme-scope[data-style-id="terminal"] .hero-copy h1::after { animation: none; }
+  .theme-scope[data-style-id="terminal"] .hero-copy h1::after,
+  .theme-scope[data-style-id="liquid-glass"] :is(.specimen,.card)::after { animation: none; }
 }
 
 @media (forced-colors: active) {

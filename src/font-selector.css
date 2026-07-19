@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap');
 .font-selector { display: grid; gap: 12px; min-width: 0; }
 .font-selector__heading { display: flex; align-items: center; gap: 10px; }
 .font-selector__icon { display: grid; width: 32px; height: 32px; flex: none; place-items: center; border-radius: 9px; color: var(--accent, #285c4b); background: var(--accent-light, #e7f0ec); }

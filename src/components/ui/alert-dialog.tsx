@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useId, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useEffect, useId, useRef, useState, type ButtonHTMLAttributes, type HTMLAttributes, type ReactNode } from "react"
+import { createPortal } from "react-dom"
 import { cn } from "../../lib/utils"
 
 type ContextValue = { open: boolean; setOpen: (open: boolean) => void; titleId: string; descriptionId: string; triggerRef: React.RefObject<HTMLButtonElement | null> }
@@ -9,15 +10,17 @@ export function AlertDialog({ children, open: controlled, defaultOpen = false, o
   const [internal, setInternal] = useState(defaultOpen)
   const titleId = useId(), descriptionId = useId(), triggerRef = useRef<HTMLButtonElement>(null)
   const open = controlled ?? internal
-  const setOpen = (next: boolean) => { if (controlled === undefined) setInternal(next); onOpenChange?.(next) }
+  const onOpenChangeRef = useRef(onOpenChange)
+  useEffect(() => { onOpenChangeRef.current = onOpenChange }, [onOpenChange])
+  const setOpen = useCallback((next: boolean) => { if (controlled === undefined) setInternal(next); onOpenChangeRef.current?.(next) }, [controlled])
   return <Context.Provider value={{ open, setOpen, titleId, descriptionId, triggerRef }}><div className="ui-alert-dialog-root">{children}</div></Context.Provider>
 }
 export function AlertDialogTrigger(props: ButtonHTMLAttributes<HTMLButtonElement>) { const { open, setOpen, triggerRef } = useAlertDialog(); return <button ref={triggerRef} type="button" {...props} className={cn("ui-alert-dialog-trigger", props.className)} aria-haspopup="dialog" aria-expanded={open} onClick={(event) => { props.onClick?.(event); if (!event.defaultPrevented) setOpen(true) }} /> }
 export function AlertDialogContent({ children, ...props }: HTMLAttributes<HTMLDivElement>) {
   const { open, setOpen, titleId, descriptionId, triggerRef } = useAlertDialog(); const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => { if (!open) return; const frame = requestAnimationFrame(() => ref.current?.querySelector<HTMLElement>("[data-alert-cancel], button")?.focus()); const key = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); if (event.key !== "Tab" || !ref.current) return; const items = [...ref.current.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])')]; if (!items.length) return; const first = items[0], last = items[items.length - 1]; if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() } }; document.addEventListener("keydown", key); return () => { cancelAnimationFrame(frame); document.removeEventListener("keydown", key); triggerRef.current?.focus() } }, [open, setOpen, triggerRef])
+  useEffect(() => { if (!open) return; const previousOverflow = document.body.style.overflow; document.body.style.overflow = "hidden"; const frame = requestAnimationFrame(() => ref.current?.querySelector<HTMLElement>("[data-alert-cancel], button")?.focus()); const key = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); if (event.key !== "Tab" || !ref.current) return; const items = [...ref.current.querySelectorAll<HTMLElement>('button, [href], input, [tabindex]:not([tabindex="-1"])')].filter((item) => !item.hasAttribute("disabled")); if (!items.length) { event.preventDefault(); ref.current.focus(); return } const first = items[0], last = items[items.length - 1]; if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() } }; document.addEventListener("keydown", key); return () => { cancelAnimationFrame(frame); document.body.style.overflow = previousOverflow; document.removeEventListener("keydown", key); triggerRef.current?.focus() } }, [open, setOpen, triggerRef])
   if (!open) return null
-  return <div className="ui-alert-dialog-layer"><div className="ui-alert-dialog-overlay" aria-hidden="true" /><div ref={ref} role="alertdialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId} tabIndex={-1} {...props} className={cn("ui-alert-dialog-content", props.className)}>{children}</div></div>
+  return createPortal(<div className="ui-alert-dialog-layer"><div className="ui-alert-dialog-overlay" aria-hidden="true" /><div ref={ref} role="alertdialog" aria-modal="true" aria-labelledby={titleId} aria-describedby={descriptionId} tabIndex={-1} {...props} className={cn("ui-alert-dialog-content", props.className)}>{children}</div></div>, triggerRef.current?.closest(".app.theme-scope") ?? document.body)
 }
 export function AlertDialogHeader(props: HTMLAttributes<HTMLDivElement>) { return <div {...props} className={cn("ui-alert-dialog-header", props.className)} /> }
 export function AlertDialogFooter(props: HTMLAttributes<HTMLDivElement>) { return <div {...props} className={cn("ui-alert-dialog-footer", props.className)} /> }

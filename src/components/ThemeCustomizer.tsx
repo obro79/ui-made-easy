@@ -1,6 +1,8 @@
-import { useId, useState } from "react"
+import { useEffect, useId, useState } from "react"
 import { Check, ChevronDown, Code2, Copy, Download, LayoutGrid, Palette, RotateCcw, SlidersHorizontal, Type } from "lucide-react"
 import {
+  accessibleFocusRing,
+  bestContrastingColor,
   exportThemeCss,
   getContrastRatio,
   type SemanticPalette,
@@ -9,7 +11,7 @@ import {
 } from "../theme"
 import { PaletteWizard } from "./PaletteWizard"
 import { StyleSelector } from "./StyleSelector"
-import { FONT_PAIRS, FontSelector } from "./FontSelector"
+import { FONT_PAIRS, FontSelector, type FontPair } from "./FontSelector"
 import { downloadStarterKitZip } from "../export-project"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs"
 import { Button } from "./ui/button"
@@ -30,6 +32,7 @@ type ThemeCustomizerProps = {
   onConfigChange: (config: ThemeConfig) => void
   onPreviewModeChange: (mode: ThemeMode) => void
   onReset: () => void
+  paletteResetKey: number
   currentStyle: string
   onStyleChange: (style: string) => void
   activePanel: CustomizerPanel
@@ -64,6 +67,7 @@ export function ThemeCustomizer({
   onConfigChange,
   onPreviewModeChange,
   onReset,
+  paletteResetKey,
   currentStyle,
   onStyleChange,
   activePanel,
@@ -74,13 +78,39 @@ export function ThemeCustomizer({
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle")
   const [exportState, setExportState] = useState<"idle" | "working" | "done" | "error">("idle")
   const palette = config[previewMode]
+  const [tokenDrafts, setTokenDrafts] = useState<Record<ThemeMode, SemanticPalette>>({
+    light: { ...config.light },
+    dark: { ...config.dark },
+  })
+
+  useEffect(() => {
+    setTokenDrafts({ light: { ...config.light }, dark: { ...config.dark } })
+  }, [config.light, config.dark])
 
   const updateConfig = (patch: Partial<ThemeConfig>) =>
     onConfigChange({ ...config, ...patch })
 
   const updateToken = (token: keyof SemanticPalette, value: string) => {
     if (!isHex(value)) return
-    updateConfig({ [previewMode]: { ...palette, [token]: value } })
+    const nextPalette = { ...palette, [token]: value.toLowerCase() }
+    if (token === "primary") nextPalette.primaryForeground = bestContrastingColor(nextPalette.primary)
+    if (token === "background" || token === "focusRing") {
+      nextPalette.focusRing = accessibleFocusRing(nextPalette.background, nextPalette.focusRing)
+    }
+    updateConfig({ [previewMode]: nextPalette })
+  }
+
+  const updateTokenDraft = (token: keyof SemanticPalette, value: string) => {
+    setTokenDrafts((current) => ({
+      ...current,
+      [previewMode]: { ...current[previewMode], [token]: value },
+    }))
+  }
+
+  const commitTokenDraft = (token: keyof SemanticPalette) => {
+    const value = tokenDrafts[previewMode][token]
+    if (isHex(value)) updateToken(token, value)
+    else updateTokenDraft(token, palette[token])
   }
 
   const copyCss = async () => {
@@ -96,7 +126,7 @@ export function ThemeCustomizer({
   const exportKit = async () => {
     setExportState("working")
     try {
-      await downloadStarterKitZip(config, `${config.preset}-theme`)
+      await downloadStarterKitZip(config, `${config.preset}-theme`, previewMode)
       setExportState("done")
     } catch {
       setExportState("error")
@@ -139,14 +169,20 @@ export function ThemeCustomizer({
             <TabsContent className="customizer-panel" value="type" forceMount>
               <section className="customizer-section">
                 <FontSelector
-                  value={FONT_PAIRS.find((pair) => pair.headingFamily === config.headingFont && pair.bodyFamily === config.bodyFont)?.id ?? "modern-sans"}
+                  pairs={(() => {
+                    const exact = FONT_PAIRS.find((pair) => pair.headingFamily === config.headingFont && pair.bodyFamily === config.bodyFont)
+                    if (exact) return FONT_PAIRS
+                    const current: FontPair = { id: "active-preset", name: "Active preset", heading: config.headingFont.split(",")[0].replaceAll("'", ""), body: config.bodyFont.split(",")[0].replaceAll("'", ""), headingFamily: config.headingFont, bodyFamily: config.bodyFont, character: "Preset-authentic pairing" }
+                    return [current, ...FONT_PAIRS]
+                  })()}
+                  value={FONT_PAIRS.find((pair) => pair.headingFamily === config.headingFont && pair.bodyFamily === config.bodyFont)?.id ?? "active-preset"}
                   onChange={(pair) => updateConfig({ headingFont: pair.headingFamily, bodyFont: pair.bodyFamily })}
                 />
               </section>
             </TabsContent>
 
             <TabsContent className="customizer-panel" value="colors" forceMount>
-              <PaletteWizard key={config.preset} config={config} onChange={onConfigChange} />
+              <PaletteWizard key={`${config.preset}-${paletteResetKey}`} config={config} onChange={onConfigChange} />
             </TabsContent>
 
             <TabsContent className="customizer-panel" value="layout" forceMount>
@@ -170,6 +206,7 @@ export function ThemeCustomizer({
               <span>Base spacing <output>{config.baseSpacing}px</output></span>
               <input
                 type="range"
+                aria-label="Base spacing"
                 min="2"
                 max="8"
                 step="1"
@@ -197,6 +234,7 @@ export function ThemeCustomizer({
               </span>
               <input
                 type="range"
+                aria-label="Corner radius"
                 min="0"
                 max="24"
                 step="1"
@@ -229,6 +267,7 @@ export function ThemeCustomizer({
               </span>
               <input
                 type="range"
+                aria-label="Border width"
                 min="0"
                 max="3"
                 step="1"
@@ -244,6 +283,7 @@ export function ThemeCustomizer({
               </span>
               <input
                 type="range"
+                aria-label="Type scale"
                 min="0.9"
                 max="1.15"
                 step="0.05"
@@ -307,7 +347,17 @@ export function ThemeCustomizer({
                     <span>{tokenLabels[token]}</span>
                     <span className="token-input">
                       <input type="color" value={palette[token]} onChange={(e) => updateToken(token, e.target.value)} />
-                      <input value={palette[token]} onChange={(e) => updateToken(token, e.target.value)} aria-label={`${tokenLabels[token]} hex`} />
+                      <input
+                        value={tokenDrafts[previewMode][token]}
+                        onChange={(e) => updateTokenDraft(token, e.target.value)}
+                        onBlur={() => commitTokenDraft(token)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") event.currentTarget.blur()
+                          if (event.key === "Escape") { updateTokenDraft(token, palette[token]); event.currentTarget.blur() }
+                        }}
+                        aria-invalid={!isHex(tokenDrafts[previewMode][token])}
+                        aria-label={`${tokenLabels[token]} hex`}
+                      />
                     </span>
                   </label>
                 ))}

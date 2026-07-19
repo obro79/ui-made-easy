@@ -14,6 +14,7 @@ export type FontPair = {
 
 export const FONT_PAIRS: readonly FontPair[] = [
   { id: "modern-sans", name: "Modern Sans", heading: "Manrope", body: "Inter", headingFamily: "Manrope, ui-sans-serif, system-ui, sans-serif", bodyFamily: "Inter, ui-sans-serif, system-ui, sans-serif", character: "Clean product UI" },
+  { id: "expressive-grotesk", name: "Expressive Grotesk", heading: "Space Grotesk", body: "Inter", headingFamily: "'Space Grotesk', Manrope, sans-serif", bodyFamily: "Inter, ui-sans-serif, system-ui, sans-serif", character: "Bold contemporary display" },
   { id: "editorial", name: "Editorial", heading: "Playfair Display", body: "Source Sans 3", headingFamily: "'Playfair Display', Georgia, serif", bodyFamily: "'Source Sans 3', Arial, sans-serif", character: "Expressive and refined" },
   { id: "neo-grotesk", name: "Neo Grotesk", heading: "Arial", body: "Helvetica", headingFamily: "Arial, Helvetica, sans-serif", bodyFamily: "Helvetica, Arial, sans-serif", character: "Direct modernism" },
   { id: "humanist", name: "Humanist", heading: "Trebuchet MS", body: "Segoe UI", headingFamily: "'Trebuchet MS', Arial, sans-serif", bodyFamily: "'Segoe UI', Arial, sans-serif", character: "Warm and approachable" },
@@ -36,6 +37,17 @@ export type FontSelectorProps = {
 }
 
 export function FontSelector({ value, onChange, pairs = FONT_PAIRS, label = "Typography", className = "" }: FontSelectorProps) {
+  const selectedVisible = pairs.some((pair) => pair.id === value)
+  const navigateOptions = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return
+    const options = [...event.currentTarget.parentElement!.querySelectorAll<HTMLButtonElement>('[role="option"]')]
+    const currentIndex = options.indexOf(event.currentTarget)
+    const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? options.length - 1 :
+      event.key === "ArrowRight" || event.key === "ArrowDown" ? Math.min(options.length - 1, currentIndex + 1) : Math.max(0, currentIndex - 1)
+    options[nextIndex]?.focus()
+    options[nextIndex]?.click()
+    event.preventDefault()
+  }
   return (
     <section className={`font-selector ${className}`.trim()} aria-labelledby="font-selector-title">
       <div className="font-selector__heading">
@@ -47,7 +59,7 @@ export function FontSelector({ value, onChange, pairs = FONT_PAIRS, label = "Typ
       </div>
 
       <div className="font-selector__grid" role="listbox" aria-label="Font pairs">
-        {pairs.map((pair) => {
+        {pairs.map((pair, index) => {
           const selected = value === pair.id
           const variables = { "--font-preview-heading": pair.headingFamily, "--font-preview-body": pair.bodyFamily } as CSSProperties
           return (
@@ -56,10 +68,12 @@ export function FontSelector({ value, onChange, pairs = FONT_PAIRS, label = "Typ
               type="button"
               role="option"
               aria-selected={selected}
+              tabIndex={selected || (!selectedVisible && index === 0) ? 0 : -1}
               className="font-pair-card"
               data-selected={selected || undefined}
               style={variables}
               onClick={() => onChange(pair)}
+              onKeyDown={navigateOptions}
             >
               <span className="font-pair-card__topline">
                 <span><strong>{pair.name}</strong><small>{pair.character}</small></span>

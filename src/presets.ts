@@ -44,7 +44,7 @@ const ALL_STYLE_PRESETS = [
   preset("tactile-maximalism", "Tactile Maximalism", "expressive-era", "Rich physical textures, depth, and oversized controls.", ["tactile", "texture", "bold"], "#ea580c", recipe("display", "organic", "raised", "comfortable", "asymmetric", "texture"), auth(["physical collage", "material craft"], ["paper/ink texture", "chunky depth", "touchable controls"], ["photoreal texture behind copy", "fake affordances"], ["food", "music", "creative retail"], "Texture intensity must reduce behind text and at high-contrast preference.")),
   preset("collage-scrapbook", "Collage/Scrapbook", "expressive-era", "Cut-paper composition with personal, collected energy.", ["collage", "paper", "personal"], "#db2777", recipe("display", "mixed", "layered", "spacious", "asymmetric", "texture"), auth(["zines", "analog scrapbooks"], ["cutout layers", "tape/label motifs", "mixed image frames"], ["random unreadable rotation", "decorative text as essential content"], ["portfolios", "communities", "campaign stories"], "Keep essential content in semantic text and cap rotation for readability.")),
   preset("hand-drawn", "Hand-drawn", "expressive-era", "Human linework softens a structured interface.", ["sketch", "human", "friendly"], "#2563eb", recipe("humanist-sans", "organic", "outlined", "comfortable", "document", "hand-drawn"), auth(["sketchbooks", "illustrated interfaces"], ["imperfect strokes", "annotation marks", "warm copy"], ["illegible handwritten body type", "wobbly layout alignment"], ["education", "workshops", "family products"], "Use handwriting only for display accents; controls and body copy stay highly legible.")),
-  preset("retrofuturism", "Retrofuturism", "expressive-era", "Past visions of technology rendered as modern UI.", ["retro", "future", "chrome"], "#7c3aed", recipe("display", "mixed", "layered", "default", "dashboard", "chrome", "high"), auth(["space-age graphics", "80s/90s computer futures"], ["chrome accents", "star/grid motifs", "optimistic display type"], ["generic synthwave neon", "illegible sci-fi labels"], ["entertainment", "AI concepts", "events"], "Keep novelty type out of dense controls and allow effects to be disabled.")),
+  preset("retrofuturism", "Retrofuturism", "expressive-era", "Past visions of technology rendered as modern UI.", ["retro", "future", "chrome"], "#e97832", recipe("display", "mixed", "layered", "default", "dashboard", "chrome", "high"), auth(["mid-century space-age graphics", "70s industrial optimism", "early computer displays"], ["chrome accents", "orbital curves", "optimistic display type"], ["generic synthwave neon", "illegible sci-fi labels"], ["entertainment", "AI concepts", "events"], "Keep novelty type out of dense controls and allow effects to be disabled.")),
   preset("terminal", "Terminal", "expressive-era", "Command-line discipline with phosphor-screen character.", ["mono", "developer", "command"], "#38d878", recipe("mono", "square", "outlined", "compact", "workspace", "none", "high"), auth(["Unix terminals", "phosphor displays"], ["monospace type", "prompt language", "green/amber accent"], ["fake scanlines over text", "all-caps paragraphs"], ["developer tools", "security", "CLI companions"], "Do not reduce font size to mimic terminals; expose commands with descriptive labels.")),
   preset("industrial", "Industrial", "expressive-era", "Utilitarian panels, labels, and engineered rhythm.", ["utility", "rugged", "technical"], "#d26722", recipe("mono", "square", "outlined", "compact", "dashboard", "grid", "high"), auth(["industrial controls", "technical labeling systems"], ["strong dividers", "stencil-like labels", "safety accent"], ["hazard stripes as decoration", "tiny technical text"], ["manufacturing", "logistics", "hardware tools"], "Safety states must follow established semantics and never rely on striping alone.")),
 
@@ -68,6 +68,9 @@ const allById = new Map<string, StylePresetDefinition>(ALL_STYLE_PRESETS.map((it
 export const STYLE_PRESETS = CURATED_STYLE_IDS.map((id) => allById.get(id)!)
 export const STYLE_PRESET_COUNT = STYLE_PRESETS.length
 export const STYLE_PRESET_IDS = STYLE_PRESETS.map((item) => item.id) as StylePresetId[]
+export const DARK_FIRST_STYLE_IDS = new Set<StylePresetId>([
+  "linear-inspired", "cinematic-mission-control", "monochrome-dark", "retrofuturism", "terminal",
+])
 
 const byId = new Map<string, StylePresetDefinition>(STYLE_PRESETS.map((item) => [item.id, item]))
 const byName = new Map<string, StylePresetDefinition>(STYLE_PRESETS.map((item) => [item.name.toLowerCase(), item]))
@@ -101,6 +104,10 @@ export function getStylePreset(idOrName: string): StylePresetDefinition | undefi
 
 export function resolveStylePresetId(idOrName: string, fallback: StylePresetId = "minimalism"): StylePresetId {
   return (getStylePreset(idOrName)?.id as StylePresetId | undefined) ?? fallback
+}
+
+export function preferredThemeMode(idOrName: string): "light" | "dark" {
+  return DARK_FIRST_STYLE_IDS.has(resolveStylePresetId(idOrName)) ? "dark" : "light"
 }
 
 export function getStylePresetsByCategory(category: StyleCategory): StylePresetDefinition[] {
