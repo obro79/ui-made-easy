@@ -94,6 +94,10 @@ The generated ZIP is a reusable Tailwind v4/shadcn starting point containing:
 
 The workbench retains visible keyboard focus, readable text, semantic controls, responsive behavior, contrast-aware palettes, and reduced-motion support across style changes.
 
+## QA evidence
+
+The current 20-preset desktop release has a checked-in [visual and interaction QA report](docs/qa/2026-07-19/README.md), including all-style contact sheets and an independently compiled export screenshot.
+
 ## Tech stack
 
 React 19, TypeScript, Vite, Lucide icons, JSZip, and shadcn-style component primitives.
