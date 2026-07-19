@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { Check, Copy, Lock, Shuffle, Unlock } from "lucide-react"
 import {
   bestContrastingColor,
   generatePalette,
@@ -22,15 +23,29 @@ type Palette = {
   foreground: string
 }
 
-type Step = 1 | 2 | 3
-
-const fields: Array<{ key: keyof Palette; label: string }> = [
-  { key: "primary", label: "Primary" },
-  { key: "secondary", label: "Secondary" },
-  { key: "background", label: "Background" },
-  { key: "surface", label: "Surface" },
-  { key: "foreground", label: "Foreground" },
+const fields: Array<{ key: keyof Palette; label: string; hint: string }> = [
+  { key: "primary", label: "Primary", hint: "Actions" },
+  { key: "secondary", label: "Secondary", hint: "Accents" },
+  { key: "background", label: "Background", hint: "Canvas" },
+  { key: "surface", label: "Surface", hint: "Cards" },
+  { key: "foreground", label: "Foreground", hint: "Text" },
 ]
+
+const EXAMPLE_PALETTE: Palette = {
+  primary: "#4f3130",
+  secondary: "#753742",
+  background: "#aa5042",
+  surface: "#d8bd8a",
+  foreground: "#d8d78f",
+}
+
+const emptyLocks = (): Record<keyof Palette, boolean> => ({
+  primary: false,
+  secondary: false,
+  background: false,
+  surface: false,
+  foreground: false,
+})
 
 function currentPalette(config: ThemeConfig): Palette {
   return {
@@ -43,35 +58,19 @@ function currentPalette(config: ThemeConfig): Palette {
 }
 
 function randomByte(): number {
-  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
-    return crypto.getRandomValues(new Uint8Array(1))[0]
-  }
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) return crypto.getRandomValues(new Uint8Array(1))[0]
   return Math.floor(Math.random() * 256)
 }
 
 function randomColor(): string {
-  return `#${[randomByte(), randomByte(), randomByte()]
-    .map((channel) => channel.toString(16).padStart(2, "0"))
-    .join("")}`
-}
-
-function makeCandidate(): Palette {
-  const primary = randomColor()
-  const secondary = randomColor()
-  const generated = generatePalette(primary)
-  const background = mixColors(primary, "#ffffff", 0.96)
-  const surface = mixColors(secondary, "#ffffff", 0.94)
-  const foreground = bestContrastingColor(background, ["#101114", mixColors(primary, "#000000", 0.72)])
-  return { primary, secondary, background, surface, foreground: foreground || generated.light.foreground }
+  return `#${[randomByte(), randomByte(), randomByte()].map((channel) => channel.toString(16).padStart(2, "0")).join("")}`
 }
 
 function buildTheme(config: ThemeConfig, colors: Palette): ThemeConfig {
   const generated = generatePalette(colors.primary)
   const darkSecondary = generatePalette(colors.secondary).dark.primary
-
   return {
     ...config,
-      preset: config.preset,
     light: {
       ...generated.light,
       ...colors,
@@ -93,141 +92,143 @@ function buildTheme(config: ThemeConfig, colors: Palette): ThemeConfig {
 }
 
 export function PaletteWizard({ config, onChange }: PaletteWizardProps) {
-  const [step, setStep] = useState<Step>(1)
-  const [candidates, setCandidates] = useState<Palette[]>([])
-  const [selected, setSelected] = useState<Palette>(() => currentPalette(config))
-  const [applied, setApplied] = useState(false)
+  const initial = currentPalette(config)
+  const [selected, setSelected] = useState<Palette>(initial)
+  const [drafts, setDrafts] = useState<Record<keyof Palette, string>>(initial)
+  const [locked, setLocked] = useState(emptyLocks)
+  const [status, setStatus] = useState("")
 
-  const checks = useMemo(
-    () => [
-      { label: "Body text", ratio: getContrastRatio(selected.foreground, selected.background) },
-      { label: "Text on surface", ratio: getContrastRatio(selected.foreground, selected.surface) },
-      { label: "Primary action", ratio: getContrastRatio(bestContrastingColor(selected.primary), selected.primary) },
-      { label: "Secondary accent", ratio: getContrastRatio(selected.secondary, selected.background) },
-    ],
-    [selected],
-  )
+  const checks = useMemo(() => [
+    { label: "Body text", ratio: getContrastRatio(selected.foreground, selected.background) },
+    { label: "Text on surface", ratio: getContrastRatio(selected.foreground, selected.surface) },
+    { label: "Primary action", ratio: getContrastRatio(bestContrastingColor(selected.primary), selected.primary) },
+  ], [selected])
 
-  const generate = () => {
-    const next = Array.from({ length: 6 }, makeCandidate)
-    setCandidates(next)
-    setSelected(next[0])
-    setApplied(false)
-  }
+  const setPalette = useCallback((palette: Palette) => {
+    setSelected(palette)
+    setDrafts(palette)
+    setStatus("")
+  }, [])
 
-  const chooseCandidate = (candidate: Palette) => {
-    setSelected(candidate)
-    setApplied(false)
-    setStep(2)
-  }
+  const randomize = useCallback(() => {
+    const next = { ...selected }
+    for (const { key } of fields) if (!locked[key]) next[key] = randomColor()
+    setPalette(next)
+  }, [locked, selected, setPalette])
 
-  const updateColor = (key: keyof Palette, value: string) => {
+  useEffect(() => {
+    const shuffleOnSpace = (event: KeyboardEvent) => {
+      if (event.code !== "Space" || event.repeat) return
+      const target = event.target
+      if (target instanceof HTMLElement && target.closest("input, textarea, select, button, a, [contenteditable='true']")) return
+      event.preventDefault()
+      randomize()
+    }
+    window.addEventListener("keydown", shuffleOnSpace)
+    return () => window.removeEventListener("keydown", shuffleOnSpace)
+  }, [randomize])
+
+  const updateHexDraft = (key: keyof Palette, value: string) => {
+    setDrafts((current) => ({ ...current, [key]: value }))
     const normalized = normalizeHex(value)
-    if (!normalized) return
-    setSelected((palette) => ({ ...palette, [key]: normalized }))
-    setApplied(false)
+    if (normalized) {
+      setSelected((current) => ({ ...current, [key]: normalized }))
+      setStatus("")
+    }
+  }
+
+  const commitHex = (key: keyof Palette) => {
+    const normalized = normalizeHex(drafts[key])
+    if (normalized) setDrafts((current) => ({ ...current, [key]: normalized }))
+  }
+
+  const copyPalette = async () => {
+    try {
+      await navigator.clipboard.writeText(fields.map(({ key }) => selected[key]).join(" "))
+      setStatus("Palette copied")
+    } catch {
+      setStatus("Could not copy palette")
+    }
   }
 
   const apply = () => {
     onChange(buildTheme(config, selected))
-    setApplied(true)
+    setStatus("Palette applied across the gallery")
   }
 
   return (
     <section className="palette-wizard" aria-labelledby="palette-wizard-title">
-      <header className="palette-wizard__header">
+      <div className="palette-wizard__header">
         <div>
-          <p className="palette-wizard__eyebrow">Guided palette</p>
-          <h2 id="palette-wizard-title">Build a five-colour system</h2>
+          <p className="palette-wizard__eyebrow">Five-colour generator</p>
+          <h2 id="palette-wizard-title">Find your palette</h2>
+          <p>Lock the colours you love, then shuffle the rest. Press <kbd>Space</kbd> for a new mix.</p>
         </div>
-        <span className="palette-wizard__count">Step {step} of 3</span>
-      </header>
+      </div>
 
-      <nav className="palette-wizard__steps" aria-label="Palette workflow">
-        {(["Generate", "Refine", "Apply"] as const).map((label, index) => {
-          const number = (index + 1) as Step
+      <div className="palette-wizard__toolbar">
+        <button className="palette-wizard__shuffle" type="button" onClick={randomize}>
+          <Shuffle size={16} aria-hidden="true" /> Randomize unlocked
+        </button>
+        <button type="button" onClick={() => setPalette(EXAMPLE_PALETTE)}>Try warm example</button>
+        <button type="button" onClick={copyPalette} aria-label="Copy all five hex colours">
+          <Copy size={16} aria-hidden="true" /> Copy
+        </button>
+      </div>
+
+      <div className="palette-wizard__strip" aria-label="Five-colour palette">
+        {fields.map(({ key, label, hint }) => {
+          const valid = normalizeHex(drafts[key]) !== null
           return (
-            <button key={label} type="button" className={step === number ? "is-current" : ""} onClick={() => setStep(number)}>
-              <span>{number}</span>{label}
-            </button>
+            <div className="palette-wizard__colour" key={key}>
+              <div className="palette-wizard__swatch" style={{ backgroundColor: selected[key], color: bestContrastingColor(selected[key]) }}>
+                <button
+                  type="button"
+                  className={locked[key] ? "is-locked" : ""}
+                  aria-pressed={locked[key]}
+                  aria-label={`${locked[key] ? "Unlock" : "Lock"} ${label.toLowerCase()} colour`}
+                  onClick={() => setLocked((current) => ({ ...current, [key]: !current[key] }))}
+                >
+                  {locked[key] ? <Lock size={17} aria-hidden="true" /> : <Unlock size={17} aria-hidden="true" />}
+                </button>
+                <label className="palette-wizard__native-picker">
+                  <span className="sr-only">Choose {label.toLowerCase()} colour</span>
+                  <input type="color" value={selected[key]} onChange={(event) => updateHexDraft(key, event.target.value)} />
+                </label>
+              </div>
+              <div className="palette-wizard__colour-meta">
+                <label htmlFor={`palette-${key}`}>{label}<small>{hint}</small></label>
+                <input
+                  id={`palette-${key}`}
+                  value={drafts[key]}
+                  onChange={(event) => updateHexDraft(key, event.target.value)}
+                  onBlur={() => commitHex(key)}
+                  aria-invalid={!valid}
+                  aria-describedby={!valid ? `palette-${key}-error` : undefined}
+                  maxLength={7}
+                  spellCheck={false}
+                />
+                {!valid && <small className="palette-wizard__error" id={`palette-${key}-error`}>Use a 3- or 6-digit hex value.</small>}
+              </div>
+            </div>
           )
         })}
-      </nav>
+      </div>
 
-      {step === 1 && (
-        <div className="palette-wizard__panel">
-          <div className="palette-wizard__intro">
-            <h3>Explore combinations</h3>
-            <p>Generate six local, random palettes. Nothing leaves your browser.</p>
+      <div className="palette-wizard__contrast" aria-label="Contrast summary">
+        {checks.map((check) => (
+          <div key={check.label}>
+            <span>{check.label}</span>
+            <strong className={check.ratio >= 4.5 ? "is-pass" : "is-warning"}>
+              {check.ratio >= 4.5 && <Check size={14} aria-hidden="true" />}
+              {check.ratio.toFixed(2)}:1 · {check.ratio >= 4.5 ? "AA" : check.ratio >= 3 ? "Large text" : "Low"}
+            </strong>
           </div>
-          <button className="palette-wizard__primary-action" type="button" onClick={generate}>
-            {candidates.length ? "Generate six more" : "Generate six palettes"}
-          </button>
-          {candidates.length > 0 && (
-            <div className="palette-wizard__candidates" aria-label="Generated palette choices">
-              {candidates.map((candidate, index) => (
-                <button key={`${candidate.primary}-${index}`} type="button" onClick={() => chooseCandidate(candidate)} aria-label={`Choose palette ${index + 1}`}>
-                  <span className="palette-wizard__swatches" aria-hidden="true">
-                    {fields.map(({ key }) => <i key={key} style={{ backgroundColor: candidate[key] }} />)}
-                  </span>
-                  <span>Palette {index + 1}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+        ))}
+      </div>
 
-      {step === 2 && (
-        <div className="palette-wizard__panel">
-          <div className="palette-wizard__intro">
-            <h3>Refine each role</h3>
-            <p>Fine-tune the five foundation colours before semantic tokens are derived.</p>
-          </div>
-          <div className="palette-wizard__fields">
-            {fields.map(({ key, label }) => (
-              <div className="palette-wizard__field" key={key}>
-                <label htmlFor={`palette-${key}`}>{label}</label>
-                <div>
-                  <input id={`palette-${key}`} type="color" value={selected[key]} onChange={(event) => updateColor(key, event.target.value)} aria-label={`Choose ${label.toLowerCase()} colour`} />
-                  <input value={selected[key]} onChange={(event) => updateColor(key, event.target.value)} aria-label={`${label} hex value`} spellCheck={false} />
-                </div>
-              </div>
-            ))}
-          </div>
-          <button className="palette-wizard__primary-action" type="button" onClick={() => setStep(3)}>Review palette</button>
-        </div>
-      )}
-
-      {step === 3 && (
-        <div className="palette-wizard__panel">
-          <div className="palette-wizard__intro">
-            <h3>Review and apply</h3>
-            <p>Contrast is advisory. You can still apply any palette you choose.</p>
-          </div>
-          <div className="palette-wizard__review-swatches" aria-label="Selected colours">
-            {fields.map(({ key, label }) => (
-              <div key={key} style={{ backgroundColor: selected[key], color: bestContrastingColor(selected[key]) }}>
-                <span>{label}</span><code>{selected[key]}</code>
-              </div>
-            ))}
-          </div>
-          <div className="palette-wizard__contrast" aria-label="Contrast summary">
-            {checks.map((check) => (
-              <div key={check.label}>
-                <span>{check.label}</span>
-                <strong className={check.ratio >= 4.5 ? "is-pass" : "is-warning"}>
-                  {check.ratio.toFixed(2)}:1 · {check.ratio >= 4.5 ? "AA pass" : check.ratio >= 3 ? "Large text only" : "Low contrast"}
-                </strong>
-              </div>
-            ))}
-          </div>
-          <button className="palette-wizard__primary-action" type="button" onClick={apply}>
-            {applied ? "Palette applied" : "Apply palette"}
-          </button>
-          <p className="palette-wizard__status" aria-live="polite">{applied ? "The palette is now active across the gallery." : ""}</p>
-        </div>
-      )}
+      <button className="palette-wizard__apply" type="button" onClick={apply}>Apply palette</button>
+      <p className="palette-wizard__status" aria-live="polite">{status}</p>
     </section>
   )
 }

@@ -144,7 +144,7 @@ export function ThemeCustomizer({
               onChange={(pair) => updateConfig({ headingFont: pair.headingFamily, bodyFont: pair.bodyFamily })}
             />
           </section>
-          <PaletteWizard config={config} onChange={onConfigChange} />
+          <PaletteWizard key={config.preset} config={config} onChange={onConfigChange} />
 
           <section className="customizer-section" aria-labelledby="spacing-title">
             <h3 id="spacing-title">Spacing & density</h3>

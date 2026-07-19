@@ -5,6 +5,8 @@ A visual UI-system laboratory for exploring, tuning, comparing, saving, and expo
 ## What it does
 
 - Presents buttons, typography, forms, cards, tables, navigation, overlays, loading states, feedback, and other common UI primitives together.
+- Generates five-colour palettes with editable hex values, per-colour locks, contrast feedback, a Space-key shuffle shortcut, and one-click application across the workbench.
+- Includes a token-aware playground for spinner, dots, pulse, equalizer, orbit, and skeleton loading treatments, with play/pause and reduced-motion support.
 - Includes 20 curated styles across product, layout, effects, expressive, and design-system-inspired categories.
 - Gives every style a documented reference basis, signature traits, misuse warnings, intended uses, and accessibility adaptations.
 - Changes composition, typography, density, geometry, surfaces, decoration, and motion through shared role tokens.
