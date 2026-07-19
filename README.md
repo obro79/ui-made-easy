@@ -23,6 +23,8 @@ A visual UI-system laboratory for exploring, tuning, comparing, saving, and expo
 
 Named product and design-system styles are clearly labeled as inspired interpretations, not official implementations.
 
+The application exposes 20 curated styles that have passed the current visual QA bar. The registry also retains 20 inactive source definitions solely so older saved themes can migrate safely and those directions can be refined for possible future activation; they are not part of the selectable catalog.
+
 ## Run locally
 
 ```bash
@@ -38,7 +40,7 @@ Open the local URL printed by Vite.
 
 ```bash
 npm run dev          # Start the local workbench
-npm run test:styles  # Verify the 20-preset registry and CSS signatures
+npm run test:styles  # Verify the curated registry, migrations, visual signatures, and responsive guards
 npm run build        # Type-check and create a production build
 npm run preview      # Preview the production build
 ```
@@ -51,7 +53,8 @@ src/
 ├── components/             Workbench, selector, comparison, and editor UI
 ├── presets.ts              Single canonical preset registry
 ├── style-dna.ts            Authenticity and visual-recipe types
-├── authentic-styles.css    Structural and signature style recipes
+├── authentic-styles.css    Shared structural and low-level recipe primitives
+├── curated-styles.css      Complete page, thumbnail, responsive, and accessibility treatments for the active 20
 ├── theme.ts                Semantic tokens, migration, and theme variables
 ├── variants.ts             Saved layout persistence
 └── export-project.ts       Tailwind/shadcn starter generation

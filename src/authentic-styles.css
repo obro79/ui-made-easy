@@ -112,25 +112,25 @@
 .theme-scope[data-treatment="cyber"] :is(.specimen,.card) { clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)); }
 .theme-scope[data-treatment="corporate"] :is(.specimen,.card) { border-radius: 6px; box-shadow: 0 2px 8px rgb(0 0 0 / .07); }
 
-/* Decorative backdrops remain pointer-transparent and token-aware. */
-.theme-scope[data-decoration]::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .42; }
-.theme-scope[data-decoration] > * { position: relative; z-index: 1; }
-.theme-scope[data-decoration="none"]::before { display: none; }
-.theme-scope[data-decoration="grid"]::before { background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 32px 32px; opacity: .22; }
-.theme-scope[data-decoration="dots"]::before { background-image: radial-gradient(var(--muted) .7px, transparent .8px); background-size: 15px 15px; opacity: .25; }
-.theme-scope[data-decoration="noise"]::before { filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3C/svg%3E%23n"); opacity: .035; }
-.theme-scope[data-decoration="gradient"]::before { background: radial-gradient(circle at 12% 15%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 38%), radial-gradient(circle at 88% 64%, color-mix(in srgb, var(--danger) 14%, transparent), transparent 34%); }
-.theme-scope[data-decoration="lines"]::before { background: repeating-linear-gradient(-55deg, transparent 0 24px, color-mix(in srgb, var(--line) 55%, transparent) 24px 25px); opacity: .2; }
-.theme-scope[data-decoration="orbs"]::before { background: radial-gradient(circle at 8% 18%, color-mix(in srgb, var(--accent) 30%, transparent) 0 9vw, transparent 9.2vw), radial-gradient(circle at 91% 78%, color-mix(in srgb, var(--secondary, var(--accent-light)) 40%, transparent) 0 14vw, transparent 14.2vw); filter: blur(22px); }
-.theme-scope[data-decoration="crosshair"]::before { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--line) 50%, transparent calc(50% + .5px)), linear-gradient(transparent calc(50% - .5px), var(--line) 50%, transparent calc(50% + .5px)); background-size: 88px 88px; opacity: .18; }
-.theme-scope[data-decoration="mesh"]::before { background: radial-gradient(circle at 14% 18%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 36%), radial-gradient(circle at 88% 22%, color-mix(in srgb, var(--danger) 18%, transparent), transparent 35%), radial-gradient(circle at 60% 84%, color-mix(in srgb, var(--secondary, var(--accent-light)) 42%, transparent), transparent 40%); filter: blur(18px); }
-.theme-scope[data-decoration="glow"]::before { background: radial-gradient(circle at 70% 18%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 32%); filter: blur(28px); }
+/* Root-app backdrops remain pointer-transparent and never rewrite overlay positioning. */
+.app.theme-scope[data-decoration]::before { content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .42; }
+.app.theme-scope[data-decoration] > :is(aside,main) { position: relative; z-index: 1; }
+.app.theme-scope[data-decoration="none"]::before { display: none; }
+.app.theme-scope[data-decoration="grid"]::before { background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 32px 32px; opacity: .22; }
+.app.theme-scope[data-decoration="dots"]::before { background-image: radial-gradient(var(--muted) .7px, transparent .8px); background-size: 15px 15px; opacity: .25; }
+.app.theme-scope[data-decoration="noise"]::before { filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3C/svg%3E%23n"); opacity: .035; }
+.app.theme-scope[data-decoration="gradient"]::before { background: radial-gradient(circle at 12% 15%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 38%), radial-gradient(circle at 88% 64%, color-mix(in srgb, var(--danger) 14%, transparent), transparent 34%); }
+.app.theme-scope[data-decoration="lines"]::before { background: repeating-linear-gradient(-55deg, transparent 0 24px, color-mix(in srgb, var(--line) 55%, transparent) 24px 25px); opacity: .2; }
+.app.theme-scope[data-decoration="orbs"]::before { background: radial-gradient(circle at 8% 18%, color-mix(in srgb, var(--accent) 30%, transparent) 0 9vw, transparent 9.2vw), radial-gradient(circle at 91% 78%, color-mix(in srgb, var(--secondary, var(--accent-light)) 40%, transparent) 0 14vw, transparent 14.2vw); filter: blur(22px); }
+.app.theme-scope[data-decoration="crosshair"]::before { background-image: linear-gradient(90deg, transparent calc(50% - .5px), var(--line) 50%, transparent calc(50% + .5px)), linear-gradient(transparent calc(50% - .5px), var(--line) 50%, transparent calc(50% + .5px)); background-size: 88px 88px; opacity: .18; }
+.app.theme-scope[data-decoration="mesh"]::before { background: radial-gradient(circle at 14% 18%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 36%), radial-gradient(circle at 88% 22%, color-mix(in srgb, var(--danger) 18%, transparent), transparent 35%), radial-gradient(circle at 60% 84%, color-mix(in srgb, var(--secondary, var(--accent-light)) 42%, transparent), transparent 40%); filter: blur(18px); }
+.app.theme-scope[data-decoration="glow"]::before { background: radial-gradient(circle at 70% 18%, color-mix(in srgb, var(--accent) 28%, transparent), transparent 32%); filter: blur(28px); }
 .theme-scope[data-decoration="gradient-border"] :is(.specimen,.card) { border-color: transparent; background: linear-gradient(var(--surface),var(--surface)) padding-box, linear-gradient(120deg,var(--accent),var(--danger),var(--accent)) border-box; }
-.theme-scope[data-decoration="texture"]::before { filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3C/svg%3E%23n"); opacity: .045; }
+.app.theme-scope[data-decoration="texture"]::before { filter: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3C/svg%3E%23n"); opacity: .045; }
 .theme-scope[data-decoration="hand-drawn"] :is(.specimen,.card,.button) { border-style: solid; border-radius: 48% 52% 47% 53% / 6% 8% 7% 9%; }
 .theme-scope[data-decoration="chrome"] :is(.specimen-bar,.button-default) { background: linear-gradient(180deg,#fff 0%,#9ca3af 38%,#f8fafc 52%,#64748b 100%); color: #111; }
 
-/* data-treatment accepts registry typography or geometry recipe values. */
+/* data-treatment accepts registry typography recipe values. */
 .theme-scope[data-treatment="editorial-serif"] :is(h1,h2,h3) { font-family: Georgia, "Times New Roman", serif; font-weight: 500; }
 .theme-scope[data-treatment="mono"] { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .theme-scope[data-treatment="display"] :is(h1,h2) { font-weight: 900; letter-spacing: -.065em; }

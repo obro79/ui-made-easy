@@ -125,65 +125,67 @@ import { Textarea } from "@/components/ui/textarea"
 
 export function ComponentShowcase() {
   return (
-    <div className="theme-scope" data-style-id="${preset.id}" data-layout="${preset.recipe.layout}" data-surface="${preset.recipe.surface}" data-treatment="${preset.recipe.typography}" data-geometry="${preset.recipe.geometry}" data-decoration="${preset.recipe.decoration}">
-    <main className="theme-showcase">
-      <header className="theme-showcase-header">
-        <Badge>Component showcase</Badge>
-        <h1 className="theme-display">A practical UI foundation</h1>
-        <p className="theme-lead">
-          Reusable typography, actions, form controls, and surfaces using your exported theme.
-        </p>
-        <div className="theme-action-row">
-          <Button>Primary action</Button>
-          <Button variant="secondary">Secondary</Button>
-          <Button variant="outline">Outline</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Button variant="destructive">Destructive</Button>
-        </div>
-      </header>
-
-      <Separator />
-
-      <section className="theme-content-grid">
-        <Card>
-          <CardHeader>
-            <CardTitle>Example card</CardTitle>
-            <CardDescription>A flexible content surface with semantic theme tokens.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="showcase-email">Email</Label>
-              <Input id="showcase-email" type="email" placeholder="you@example.com" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="showcase-message">Message</Label>
-              <Textarea id="showcase-message" placeholder="Tell us what you are building…" />
-            </div>
-          </CardContent>
-          <CardFooter className="justify-end gap-2">
-            <Button variant="ghost">Cancel</Button>
-            <Button>Save changes</Button>
-          </CardFooter>
-        </Card>
-
-        <div className="theme-surface theme-surface-stack">
-          <div className="space-y-2">
-            <p className="text-role-sm font-medium text-primary">Typography</p>
-            <h2 className="theme-title">Clear hierarchy by default</h2>
-            <p className="theme-muted">
-              Use semantic colors so every component responds to light and dark themes consistently.
+    <div className="app theme-scope" data-style-id="${preset.id}" data-layout="${preset.recipe.layout}" data-surface="${preset.recipe.surface}" data-treatment="${preset.recipe.typography}" data-geometry="${preset.recipe.geometry}" data-decoration="${preset.recipe.decoration}">
+      <main className="theme-showcase">
+        <header className="page-hero theme-showcase-header">
+          <div className="hero-copy">
+            <Badge className="badge">Component showcase</Badge>
+            <h1 className="theme-display">A practical UI foundation</h1>
+            <p className="theme-lead">
+              Reusable typography, actions, form controls, and surfaces using your exported theme.
             </p>
           </div>
-          <Separator />
-          <div className="flex flex-wrap gap-2">
-            <Badge>Default</Badge>
-            <Badge variant="secondary">Secondary</Badge>
-            <Badge variant="outline">Outline</Badge>
-            <Badge variant="destructive">Destructive</Badge>
+          <div className="header-actions hero-toolbar theme-action-row">
+            <Button className="button button-default">Primary action</Button>
+            <Button className="button button-secondary" variant="secondary">Secondary</Button>
+            <Button className="button button-outline" variant="outline">Outline</Button>
+            <Button className="button button-ghost" variant="ghost">Ghost</Button>
+            <Button className="button button-destructive" variant="destructive">Destructive</Button>
           </div>
-        </div>
-      </section>
-    </main>
+        </header>
+
+        <Separator />
+
+        <section className="spec-section theme-content-grid">
+          <Card className="card specimen">
+            <CardHeader className="card-header">
+              <CardTitle className="card-title">Example card</CardTitle>
+              <CardDescription className="card-description">A flexible content surface with semantic theme tokens.</CardDescription>
+            </CardHeader>
+            <CardContent className="card-content space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="showcase-email">Email</Label>
+                <Input className="input" id="showcase-email" type="email" placeholder="you@example.com" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="showcase-message">Message</Label>
+                <Textarea className="input" id="showcase-message" placeholder="Tell us what you are building…" />
+              </div>
+            </CardContent>
+            <CardFooter className="card-footer justify-end gap-2">
+              <Button className="button button-ghost" variant="ghost">Cancel</Button>
+              <Button className="button button-default">Save changes</Button>
+            </CardFooter>
+          </Card>
+
+          <div className="card specimen theme-surface theme-surface-stack">
+            <div className="space-y-2">
+              <p className="eyebrow text-role-sm font-medium text-primary">Typography</p>
+              <h2 className="card-title theme-title">Clear hierarchy by default</h2>
+              <p className="card-description theme-muted">
+                Use semantic colors so every component responds to light and dark themes consistently.
+              </p>
+            </div>
+            <Separator />
+            <div className="theme-action-row">
+              <Badge className="badge">Default</Badge>
+              <Badge className="badge" variant="secondary">Secondary</Badge>
+              <Badge className="badge" variant="outline">Outline</Badge>
+              <Badge className="badge" variant="destructive">Destructive</Badge>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   )
 }
@@ -208,12 +210,13 @@ export function generateThemeManifest(theme: ThemeConfig): string {
   return `${JSON.stringify({
     schemaVersion: 1,
     source: "UI Component Gallery",
+    target: "Next.js App Router",
     preset: { id: preset.id, name: preset.name, category: preset.category, description: preset.description },
     modeSupport: ["light", "dark"],
     layout: { contentWidth: theme.contentWidth, maxWidth: themeVariables(theme, "light")["content-max"], density: theme.density },
     typography: { headingFont: theme.headingFont, bodyFont: theme.bodyFont, typeScale: theme.typeScale },
     geometry: { baseSpacing: theme.baseSpacing, radius: theme.radius, borderWidth: theme.borderWidth, shadow: theme.shadow },
-    recipes: ["theme-showcase", "theme-showcase-header", "theme-display", "theme-lead", "theme-action-row", "theme-content-grid", "theme-surface", "theme-surface-stack", "theme-title", "theme-muted"],
+    recipes: ["app", "theme-scope", "page-hero", "hero-copy", "hero-toolbar", "header-actions", "spec-section", "button", "card", "specimen", "badge", "input", "theme-showcase", "theme-showcase-header", "theme-display", "theme-lead", "theme-action-row", "theme-content-grid", "theme-surface", "theme-surface-stack", "theme-title", "theme-muted"],
     structuralRecipe: preset.recipe,
     authenticity: { ...preset.authenticity, inspiredReference: preset.category === "system-reference" },
   }, null, 2)}\n`
@@ -224,22 +227,23 @@ export function generateExportReadme(theme: ThemeConfig): string {
   const preset = getStylePreset(theme.preset)!
   const code = "`"
   return [
-    `# ${preset.name} UI theme`,
+    `# ${preset.name} UI theme for Next.js App Router`,
     "",
-    `Generated from the UI Component Gallery. This bundle contains Tailwind CSS v4 theme tokens, a reusable shadcn/ui showcase, and a shadcn ${code}components.json${code} configuration.`,
+    `Generated from the UI Component Gallery for a Next.js App Router project. This bundle contains Tailwind CSS v4 theme tokens, a reusable shadcn/ui Server Component showcase, and a shadcn ${code}components.json${code} configuration.`,
     "",
     "## Install",
     "",
-    `1. Copy ${code}globals.css${code} and ${code}style-recipe.css${code} into ${code}src/app/${code}, then import the recipe after globals.`,
-    `2. Copy ${code}ComponentShowcase.tsx${code} into your components directory.`,
-    "3. Install the showcase primitives:",
+    `1. Copy ${code}globals.css${code} and ${code}style-recipe.css${code} into your Next.js ${code}src/app/${code} directory.`,
+    `2. Add ${code}@import "./style-recipe.css";${code} immediately after ${code}@import "tailwindcss";${code} in ${code}src/app/globals.css${code}, before all CSS rules.`,
+    `3. Copy ${code}ComponentShowcase.tsx${code} into ${code}src/components/${code}. It is a Server Component and does not require ${code}"use client"${code}.`,
+    "4. From the Next.js project root, install the showcase primitives:",
     "",
     `${code}${code}${code}sh`,
     "npx shadcn@latest add badge button card input label separator textarea",
     `${code}${code}${code}`,
     "",
-    `4. Render ${code}<ComponentShowcase />${code} from a page. Add the ${code}dark${code} class to an ancestor to preview the dark palette.`,
-    `5. Install or import the selected fonts if they are not already available. The exported font stacks include graceful system fallbacks, but font files are not bundled.`,
+    `5. Render ${code}<ComponentShowcase />${code} from an App Router page. Add the ${code}dark${code} class to an ancestor to preview the dark palette.`,
+    `6. Install or import the selected fonts if they are not already available. The exported font stacks include graceful system fallbacks, but font files are not bundled.`,
     "",
     "## Theme settings",
     "",

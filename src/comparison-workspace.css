@@ -45,6 +45,8 @@
   --preview-text-title: calc(15px * var(--type-scale));
   --preview-text-heading: calc(26px * var(--type-scale));
   --preview-text-metric: calc(28px * var(--type-scale));
+  position: relative;
+  isolation: isolate;
   min-width: 0;
   overflow: hidden;
   color: var(--foreground);
@@ -55,19 +57,37 @@
   font-family: var(--font-body, Inter, ui-sans-serif, system-ui, sans-serif);
 }
 
-.comparison-preview__header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3) var(--space-4); border-bottom: var(--border-width) solid var(--border); background: var(--surface); }
-.comparison-preview__identity { display: flex; min-width: 0; align-items: center; gap: var(--space-3); }
+/* The gallery has broad header recipes. Keep both comparison headers compact
+   and deterministic regardless of the style being previewed. */
+.comparison-workspace .comparison-preview .comparison-preview__header,
+.comparison-workspace .comparison-preview .comparison-canvas__intro {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  transform: none;
+}
+.comparison-workspace .comparison-preview .comparison-canvas__intro {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.comparison-preview__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 14px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.comparison-preview__identity { display: flex; min-width: 0; align-items: center; gap: 10px; }
 .comparison-preview__identity h2 { overflow: hidden; margin: 0; font-family: var(--font-heading, inherit); font-size: var(--preview-text-title); text-overflow: ellipsis; white-space: nowrap; }
-.comparison-preview__identity p { margin: var(--space-1) 0 0; color: var(--muted-foreground); font-size: var(--preview-text-sm); text-transform: capitalize; }
+.comparison-preview__identity p { margin: 2px 0 0; color: var(--muted-foreground); font-size: var(--preview-text-sm); text-transform: capitalize; }
 .comparison-swatch { width: 28px; height: 28px; flex: none; border: 1px solid var(--border); border-radius: 50%; box-shadow: inset 0 0 0 3px var(--surface); }
-.comparison-preview__actions { display: flex; gap: var(--space-1); }
+.comparison-preview__actions { display: flex; gap: 3px; }
 .comparison-preview__actions button { display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: max(4px, var(--radius-sm)); color: var(--muted-foreground); background: transparent; cursor: pointer; }
 .comparison-preview__actions button:hover { color: var(--foreground); background: var(--secondary); }
 .comparison-preview__actions .comparison-remove:hover { color: var(--destructive); }
 .comparison-preview__actions svg { width: 15px; }
 
-.comparison-canvas { display: grid; gap: var(--space-4); max-width: var(--content-max); margin-inline: auto; padding: var(--space-6); font-size: var(--preview-text-body); }
-.comparison-canvas :is(h2, h3) { font-family: var(--font-heading, inherit); }
+.comparison-canvas { display: grid; gap: var(--space-4); padding: var(--space-6); font-size: var(--preview-text-body); }
+.comparison-canvas :is(h2, h3), .comparison-metric { font-family: var(--font-heading, inherit); }
 .comparison-canvas .comparison-eyebrow { font-size: var(--preview-text-sm); }
 .comparison-canvas__intro h2 { margin: var(--space-2) 0 var(--space-1); font-size: var(--preview-text-heading); line-height: 1.05; letter-spacing: -.035em; }
 .comparison-canvas__intro p, .comparison-card p { margin: 0; color: var(--muted-foreground); line-height: 1.5; }
@@ -76,18 +96,18 @@
 .comparison-button--primary { color: var(--primary-foreground); background: var(--primary); }
 .comparison-button--secondary { color: var(--foreground); border-color: var(--border); background: var(--secondary); }
 .comparison-card { padding: var(--space-4); border: var(--border-width) solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-card); }
-.comparison-card__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-2); }
-.comparison-card h3 { margin: var(--space-1) 0 0; font-size: var(--preview-text-title); }
-.comparison-pill, .comparison-status { display: inline-flex; padding: var(--space-1) var(--space-2); border-radius: 999px; color: var(--success); background: color-mix(in srgb, var(--success) 12%, transparent); font-size: var(--preview-text-xs); font-weight: 700; }
-.comparison-metric { display: block; margin: var(--space-4) 0 var(--space-2); font-family: var(--font-heading, inherit); font-size: var(--preview-text-metric); }
+.comparison-card__heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.comparison-card h3 { margin: 3px 0 0; font-size: var(--preview-text-title); }
+.comparison-pill, .comparison-status { display: inline-flex; padding: 3px 7px; border-radius: 999px; color: var(--success); background: color-mix(in srgb, var(--success) 12%, transparent); font-size: var(--preview-text-xs); font-weight: 700; }
+.comparison-metric { display: block; margin: var(--space-4) 0 var(--space-2); font-size: var(--preview-text-metric); }
 .comparison-progress { height: 6px; overflow: hidden; margin-bottom: var(--space-2); border-radius: 99px; background: var(--secondary); }
 .comparison-progress span { display: block; height: 100%; border-radius: inherit; background: var(--primary); }
 .comparison-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--space-2); }
 .comparison-form label { display: grid; gap: var(--space-1); color: var(--muted-foreground); font-size: var(--preview-text-sm); font-weight: 650; }
 .comparison-form input { width: 100%; min-width: 0; height: 36px; padding: 0 var(--space-3); border: var(--border-width) solid var(--border); border-radius: var(--radius); color: var(--foreground); outline: none; background: var(--surface); font: inherit; }
 .comparison-form input:focus { border-color: var(--focus-ring); box-shadow: 0 0 0 2px color-mix(in srgb, var(--focus-ring) 25%, transparent); }
-.comparison-table-wrap { overflow: hidden; border: var(--border-width) solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
-.comparison-table { width: 100%; border-collapse: collapse; text-align: left; }
+.comparison-table-wrap { overflow-x: auto; overflow-y: hidden; border: var(--border-width) solid var(--border); border-radius: var(--radius-lg); background: var(--surface); overscroll-behavior-inline: contain; }
+.comparison-table { width: 100%; min-width: 330px; border-collapse: collapse; text-align: left; }
 .comparison-table caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .comparison-table th, .comparison-table td { padding: var(--space-3); border-bottom: var(--border-width) solid var(--border); font-size: var(--preview-text-sm); }
 .comparison-table th { color: var(--muted-foreground); font-weight: 650; background: color-mix(in srgb, var(--secondary) 60%, transparent); }
@@ -95,15 +115,103 @@
 .comparison-alert { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-3); border: var(--border-width) solid var(--border); border-radius: var(--radius); background: var(--secondary); }
 .comparison-alert svg { flex: none; color: var(--primary); }
 .comparison-alert strong, .comparison-alert span { display: block; }
-.comparison-alert span { margin-top: var(--space-1); color: var(--muted-foreground); font-size: var(--preview-text-sm); }
+.comparison-alert span { margin-top: 2px; color: var(--muted-foreground); font-size: var(--preview-text-sm); }
 
-.comparison-preview :is(button, input):focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+/* Compact recipe engine ---------------------------------------------------
+   Full-page recipes target main/spec-section/card. Comparison uses its own
+   small canvas, so reproduce each registry axis against comparison roles. */
+
+/* A card-local decoration layer must never use the app recipe's fixed layer. */
+.comparison-workspace .comparison-preview.theme-scope[data-decoration]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  opacity: .34;
+  filter: none;
+}
+.comparison-workspace .comparison-preview.theme-scope[data-decoration] > * { position: relative; z-index: 1; }
+.comparison-preview[data-decoration="none"]::before { display: none; }
+.comparison-preview[data-decoration="grid"]::before { background-image: linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px); background-size: 22px 22px; opacity: .2; }
+.comparison-preview[data-decoration="mesh"]::before { background: radial-gradient(circle at 12% 8%,color-mix(in srgb,var(--primary) 34%,transparent),transparent 36%),radial-gradient(circle at 92% 32%,color-mix(in srgb,var(--destructive) 18%,transparent),transparent 34%),radial-gradient(circle at 62% 92%,color-mix(in srgb,var(--secondary) 70%,transparent),transparent 42%); filter: blur(10px); }
+.comparison-preview[data-decoration="glow"]::before { background: radial-gradient(circle at 75% 10%,color-mix(in srgb,var(--primary) 34%,transparent),transparent 38%); filter: blur(14px); }
+.comparison-preview[data-decoration="texture"]::before { background-image: radial-gradient(color-mix(in srgb,var(--foreground) 24%,transparent) .55px,transparent .7px); background-size: 5px 5px; opacity: .12; }
+.comparison-preview[data-decoration="chrome"]::before { background: linear-gradient(135deg,transparent 25%,color-mix(in srgb,var(--primary) 16%,transparent),transparent 68%); }
+.comparison-preview[data-decoration="gradient-border"] { border-color: transparent; background: linear-gradient(var(--background),var(--background)) padding-box,linear-gradient(120deg,var(--primary),var(--destructive),var(--primary)) border-box; }
+.comparison-preview[data-decoration="hand-drawn"] :is(.comparison-card,.comparison-button,.comparison-form input) { border-radius: 48% 52% 47% 53% / 8% 7% 9% 6%; }
+
+/* Typography treatment. */
+.comparison-preview[data-treatment="editorial-serif"] :is(.comparison-canvas h2,.comparison-canvas h3,.comparison-metric) { font-family: var(--font-heading,Georgia,serif); font-weight: 500; }
+.comparison-preview[data-treatment="mono"] { font-family: var(--font-mono,ui-monospace,monospace); }
+.comparison-preview[data-treatment="mono"] :is(h2,h3,.comparison-button) { font-family: inherit; letter-spacing: -.025em; }
+.comparison-preview[data-treatment="display"] .comparison-canvas h2 { font-weight: 900; letter-spacing: -.06em; text-transform: uppercase; }
+.comparison-preview[data-treatment="geometric-sans"] .comparison-canvas h2 { letter-spacing: -.055em; }
+.comparison-preview[data-treatment="humanist-sans"] .comparison-canvas { letter-spacing: .002em; }
+
+/* Geometry treatment. */
+.comparison-preview[data-geometry="square"] :is(.comparison-card,.comparison-button,.comparison-form input,.comparison-table-wrap,.comparison-alert) { border-radius: 0; }
+.comparison-preview[data-geometry="subtle"] :is(.comparison-card,.comparison-table-wrap) { border-radius: max(4px,var(--radius-sm)); }
+.comparison-preview[data-geometry="rounded"] :is(.comparison-card,.comparison-table-wrap) { border-radius: max(16px,var(--radius-lg)); }
+.comparison-preview[data-geometry="rounded"] :is(.comparison-button,.comparison-form input,.comparison-alert) { border-radius: max(10px,var(--radius)); }
+.comparison-preview[data-geometry="pill"] :is(.comparison-button,.comparison-form input) { border-radius: 999px; }
+.comparison-preview[data-geometry="mixed"] .comparison-card { border-radius: 3px 22px; }
+.comparison-preview[data-geometry="organic"] .comparison-card { border-radius: 24px 9px 21px 13px; }
+
+/* Surface treatment. */
+.comparison-preview[data-surface="flat"] :is(.comparison-card,.comparison-table-wrap) { box-shadow: none; background: transparent; }
+.comparison-preview[data-surface="outlined"] :is(.comparison-card,.comparison-table-wrap) { box-shadow: none; border-color: var(--border); }
+.comparison-preview[data-surface="raised"] :is(.comparison-card,.comparison-table-wrap) { border-color: transparent; box-shadow: 0 10px 24px rgb(0 0 0 / .12); }
+.comparison-preview[data-surface="layered"] :is(.comparison-card,.comparison-table-wrap) { box-shadow: inset 0 1px rgb(255 255 255 / .1),0 10px 26px rgb(0 0 0 / .14); }
+.comparison-preview[data-surface="glass"] :is(.comparison-card,.comparison-table-wrap,.comparison-alert) { border-color: color-mix(in srgb,var(--foreground) 15%,transparent); background: color-mix(in srgb,var(--surface) 68%,transparent); backdrop-filter: blur(12px) saturate(1.2); }
+.comparison-preview[data-surface="soft"] :is(.comparison-card,.comparison-table-wrap) { border-color: transparent; box-shadow: -4px -4px 12px color-mix(in srgb,#fff 45%,transparent),6px 6px 15px rgb(0 0 0 / .1); }
+.comparison-preview[data-surface="canvas"] :is(.comparison-card,.comparison-table-wrap) { border-style: dashed; background: color-mix(in srgb,var(--surface) 90%,transparent); }
+
+/* Layout treatment, compressed into the same fair specimen inventory. */
+.comparison-preview[data-layout="document"] .comparison-canvas { max-width: 390px; margin-inline: auto; }
+.comparison-preview[data-layout="document"] .comparison-canvas__intro { padding-block: var(--space-3); border-bottom: 1px solid var(--border); }
+.comparison-preview[data-layout="dashboard"] .comparison-canvas { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; }
+.comparison-preview[data-layout="dashboard"] .comparison-canvas__intro,
+.comparison-preview[data-layout="dashboard"] .comparison-table-wrap { grid-column: 1 / -1; }
+.comparison-preview[data-layout="grid"] .comparison-canvas { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.comparison-preview[data-layout="grid"] .comparison-canvas__intro { grid-column: 1 / -1; }
+.comparison-preview[data-layout="workspace"] .comparison-canvas { padding-left: calc(var(--space-6) + 9px); border-left: 9px solid color-mix(in srgb,var(--primary) 18%,var(--surface)); }
+.comparison-preview[data-layout="canvas"] .comparison-canvas { margin: var(--space-3); border: 1px dashed var(--border); background-image: radial-gradient(var(--border) .65px,transparent .75px); background-size: 14px 14px; }
+.comparison-preview[data-layout="timeline"] .comparison-canvas { padding-left: calc(var(--space-6) + 14px); background: linear-gradient(90deg,transparent calc(var(--space-6) + 4px),var(--border) 0 calc(var(--space-6) + 5px),transparent 0); }
+.comparison-preview[data-layout="spatial"] .comparison-card { transform: translateX(4px) rotate(.35deg); box-shadow: -8px 11px 28px rgb(0 0 0 / .14); }
+.comparison-preview[data-layout="asymmetric"] .comparison-canvas__intro { width: 82%; }
+.comparison-preview[data-layout="asymmetric"] .comparison-card { width: 91%; margin-left: auto; }
+
+/* The curated styles get one unmistakable signature in addition to recipes. */
+.comparison-preview[data-style-id="minimalism"] .comparison-card { border-inline: 0; border-radius: 0; }
+.comparison-preview[data-style-id="swiss"] .comparison-canvas__intro { border-top: 4px solid var(--foreground); padding-top: var(--space-3); }
+.comparison-preview[data-style-id="editorial"] .comparison-canvas__intro h2::first-letter { color: var(--primary); font-size: 1.25em; }
+.comparison-preview[data-style-id="saas-modern"] .comparison-button--primary { box-shadow: 0 7px 18px color-mix(in srgb,var(--primary) 30%,transparent); }
+.comparison-preview[data-style-id="linear-inspired"] .comparison-preview__header { background: color-mix(in srgb,var(--primary) 7%,var(--surface)); }
+.comparison-preview[data-style-id="enterprise-dense"] .comparison-canvas { gap: var(--space-2); }
+.comparison-preview[data-style-id="enterprise-dense"] :is(.comparison-button,.comparison-form input) { min-height: 32px; height: 32px; }
+.comparison-preview[data-style-id="bento-grid"] .comparison-card { min-height: 132px; }
+.comparison-preview[data-style-id="cinematic-mission-control"] .comparison-canvas__intro { padding: var(--space-3); background: radial-gradient(circle at 80% 0,color-mix(in srgb,var(--primary) 24%,transparent),transparent 52%); }
+.comparison-preview[data-style-id="canvas"] .comparison-card { transform: rotate(-.35deg); }
+.comparison-preview[data-style-id="node-based"] .comparison-card { position: relative; }
+.comparison-preview[data-style-id="node-based"] .comparison-card::before { content: ""; position: absolute; left: -5px; top: 24px; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+.comparison-preview[data-style-id="split-pane-workspace"] .comparison-canvas { background: linear-gradient(90deg,color-mix(in srgb,var(--surface) 60%,transparent) 0 28%,transparent 28%); }
+.comparison-preview[data-style-id="timeline"] .comparison-eyebrow::before { content: "01  "; color: var(--foreground); }
+.comparison-preview[data-style-id="liquid-glass"] .comparison-card { box-shadow: inset 0 1px rgb(255 255 255 / .55),0 14px 30px rgb(0 0 0 / .15); }
+.comparison-preview[data-style-id="aurora-mesh"] .comparison-canvas__intro h2 { color: transparent; background: linear-gradient(90deg,var(--primary),var(--destructive)); background-clip: text; }
+.comparison-preview[data-style-id="monochrome-dark"] { filter: grayscale(1); }
+.comparison-preview[data-style-id="neo-brutalism"] :is(.comparison-card,.comparison-button--primary) { border: 2px solid var(--foreground); box-shadow: 4px 4px 0 var(--foreground); }
+.comparison-preview[data-style-id="collage-scrapbook"] .comparison-card { transform: rotate(-.6deg); }
+.comparison-preview[data-style-id="retrofuturism"] .comparison-canvas__intro h2 { font-style: italic; text-shadow: 2px 2px var(--secondary); }
+.comparison-preview[data-style-id="terminal"] .comparison-canvas__intro h2::after { content: "_"; color: var(--primary); }
+.comparison-preview[data-style-id="material-3-inspired"] .comparison-button { border-radius: 999px; }
 .comparison-empty { display: grid; min-height: calc(100vh - 93px); place-content: center; justify-items: center; padding: 24px; text-align: center; }
 .comparison-empty svg { width: 40px; height: 40px; padding: 9px; border-radius: 50%; background: #e5e8ec; }
 .comparison-empty h2 { margin: 16px 0 4px; }
 .comparison-empty p { margin: 0; color: #696d75; }
 
-.comparison-workspace__header button:focus-visible { outline: 3px solid #4385ff; outline-offset: 2px; }
+.comparison-workspace button:focus-visible, .comparison-workspace input:focus-visible { outline: 3px solid #4385ff; outline-offset: 2px; }
 
 @media (max-width: 980px) {
   .comparison-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; }
