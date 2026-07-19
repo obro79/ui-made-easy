@@ -11,7 +11,8 @@
   align-items: end;
   min-width: 0;
 }
-.app.theme-scope > aside { position: fixed; inset: 0 auto 0 0; width: 248px; }
+.app.theme-scope > aside { position: fixed; inset: 0 auto 0 0; width: 248px; flex-shrink: 0; }
+.app.theme-scope .brand { display: flex; align-items: center; min-height: 30px; }
 .app.theme-scope .hero-copy { min-width: 0; }
 .app.theme-scope .hero-copy h1 { max-width: 12ch; text-wrap: balance; }
 .app.theme-scope .hero-copy .lede { max-width: 44rem; }
@@ -25,11 +26,19 @@
 }
 .app.theme-scope .hero-toolbar .button { flex: 0 0 auto; min-height: 42px; }
 
+@media (min-width: 851px) {
+  .app.theme-scope[data-layout] > main {
+    width: calc(100% - 248px);
+    margin-left: 248px;
+    margin-right: 0;
+  }
+}
+
 /* The base gallery owns the fixed sidebar; recipes own only the content rail. */
 .app.theme-scope[data-layout="document"] main {
   width: min(1120px, calc(100vw - 248px));
   max-width: 1120px;
-  margin-left: calc(248px + max(0px, (100vw - 248px - 1120px) / 2));
+  margin-left: 248px;
   margin-right: 0;
 }
 .app.theme-scope[data-layout="document"] .page-hero {

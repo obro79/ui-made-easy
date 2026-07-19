@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs"
 const presetsSource = readFileSync(new URL("../src/presets.ts", import.meta.url), "utf8")
 const recipeCssSource = readFileSync(new URL("../src/authentic-styles.css", import.meta.url), "utf8")
 const curatedCssSource = readFileSync(new URL("../src/curated-styles.css", import.meta.url), "utf8")
+const appSource = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8")
 
 const definedPresetIds = [...presetsSource.matchAll(/preset\("([a-z0-9-]+)"/g)].map((match) => match[1])
 const curatedBlock = presetsSource.match(/CURATED_STYLE_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/)
@@ -53,11 +54,17 @@ for (const id of uniquePresets) {
 }
 
 const requiredGlobalGuards = [
+  "@media (min-width: 851px)",
   "@media (max-width: 1180px)", "@media (max-width: 850px)", "@media (max-width: 520px)",
   "@media (prefers-reduced-motion: reduce)", "@media (forced-colors: active)",
+  ".app.theme-scope[data-layout] > main",
+  "width: calc(100% - 248px)",
+  "margin-left: 248px",
   ".app.theme-scope[data-layout] main { width: 100%; max-width: none; margin: 0; }",
 ]
 for (const guard of requiredGlobalGuards) if (!curatedCssSource.includes(guard)) fail(`missing responsive/accessibility guard: ${guard}`)
+if (recipeCssSource.includes("> :is(aside,main)")) fail("decorative backdrop must not pull the fixed sidebar back into document flow")
+if (appSource.includes("<span>UI</span>")) fail("sidebar brand must not restore the removed UI tile")
 
 const mobileSection = curatedCssSource.slice(
   curatedCssSource.indexOf("@media (max-width: 850px)"),
