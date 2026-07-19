@@ -1,7 +1,14 @@
 {
-  "name": "ui-components",
+  "name": "ui-made-easy",
   "private": true,
   "version": "0.1.0",
+  "description": "Visual UI-system workbench with 20 curated styles, live palette generation, loading playgrounds, comparison, and Tailwind/shadcn export.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/obro79/ui-made-easy.git"
+  },
+  "homepage": "https://github.com/obro79/ui-made-easy#readme",
   "type": "module",
   "scripts": {
     "dev": "vite",
