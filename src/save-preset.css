@@ -1,0 +1,23 @@
+.save-preset-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(16 21 18 / 50%);
+  backdrop-filter: blur(8px);
+}
+.save-preset-dialog { width: min(460px, 100%); padding: 28px; border: 1px solid var(--line); border-radius: 18px; color: var(--ink); background: var(--surface); box-shadow: 0 24px 80px rgb(0 0 0 / 32%); }
+.save-preset-dialog h2 { margin: 6px 0 8px; font-size: 27px; }
+.save-preset-dialog > p:not(.eyebrow) { margin-bottom: 22px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.save-preset-dialog label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 800; }
+.save-preset-dialog input { width: 100%; height: 46px; padding: 0 13px; border: 1px solid var(--line); border-radius: 9px; color: var(--ink); background: var(--bg); font-size: 16px; }
+.save-preset-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.save-preset-capacity { display: block; margin-top: 14px; color: var(--muted); font: 500 10px 'DM Mono', monospace; text-align: right; text-transform: uppercase; letter-spacing: .06em; }
+.header-actions .button, .header-actions .customize-trigger { white-space: nowrap; }
+.theme-scope { font-family: var(--font-body, Manrope, ui-sans-serif, system-ui, sans-serif); }
+.theme-scope :is(h1, h2, h3, h4, .card-title) { font-family: var(--font-heading, Manrope, ui-sans-serif, system-ui, sans-serif); }
+.customizer-footer .export-kit-button { grid-column: 1 / -1; }
+@media (max-width: 520px) { .save-preset-layer { align-items: end; padding: 0; } .save-preset-dialog { border-radius: 20px 20px 0 0; padding: 24px 20px max(24px, env(safe-area-inset-bottom)); } .save-preset-actions .button { min-height: 44px; flex: 1; } }
+@media (prefers-reduced-motion: reduce) { .button { transition: none; } }

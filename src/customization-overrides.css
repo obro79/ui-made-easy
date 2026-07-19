@@ -1,0 +1,23 @@
+/* Live design-system controls. Kept after preset CSS so explicit user choices win. */
+.app.theme-scope main{max-width:var(--content-max,1120px);font-size:var(--text-base,14px);line-height:var(--line-body,1.55)}
+.app.theme-scope :is(h1,h2,h3,h4,.card-title){font-family:var(--font-heading);font-weight:var(--heading-weight,700);letter-spacing:var(--heading-tracking,-.035em)}
+.app.theme-scope header>div>h1{font-size:clamp(38px,5vw,var(--text-display,58px))}
+.app.theme-scope .section-heading h2{font-size:var(--text-title,28px)}
+.app.theme-scope :is(p,label,input,select,button,td){font-size:inherit}
+.app.theme-scope :is(.card,.specimen,.ui-dialog-content,.ui-alert-dialog-content,.ui-empty,.ui-skeleton-card){border-width:var(--border-width,1px);border-radius:var(--radius-lg,12px);box-shadow:var(--shadow-card,var(--shadow))}
+.app.theme-scope :is(.button,input,select,.menu,.ui-tabs-list,.ui-tabs-trigger,.ui-pagination-link,.ui-alert,.ui-popover-content,.ui-accordion-item,.customizer-drawer){border-radius:var(--radius-md,8px)}
+.app.theme-scope :is(input,select,.button,.ui-tabs-list,.ui-pagination-link,.ui-alert,.ui-popover-content){border-width:var(--border-width,1px)}
+.app.theme-scope .badge{border-radius:calc(var(--radius,8px) * 3)}
+.app.theme-scope .switch input,.app.theme-scope .ui-progress-track{border-radius:calc(var(--radius,8px) * 3)}
+.app.theme-scope :is(.specimen-content,.card-header,.ui-dialog-content,.ui-alert-dialog-content,.ui-empty){padding:var(--surface-padding,24px)}
+.app.theme-scope :is(.foundation-grid,.two-col,.card-grid,.row,.form-stack,.ui-alert,.ui-dialog-footer,.ui-alert-dialog-footer){gap:var(--layout-gap,16px)}
+.app.theme-scope :is(.button,input,select){min-height:var(--control-height,40px)}
+.app.theme-scope .button{padding-inline:var(--control-padding-x,16px)}
+.app.theme-scope :is(.button,input,select,.menu,.ui-alert,.ui-popover-content,.ui-dialog-content,.ui-alert-dialog-content){border-color:var(--border,var(--line));color:var(--foreground,var(--ink))}
+.app.theme-scope :is(.button-default,.ui-alert-dialog-action){color:var(--primary-foreground,#fff);background:var(--primary,var(--accent))}
+.app.theme-scope :is(button,a,input,select):focus-visible{outline-color:var(--focus-ring,var(--accent))}
+.appearance-controls .segmented-control{grid-template-columns:repeat(4,minmax(0,1fr))}
+.appearance-controls .control-label{display:block;margin-top:14px;color:var(--foreground,var(--ink));font-size:12px;font-weight:700}
+.appearance-controls .range-field+.control-label{margin-top:18px}
+.customizer-value{color:var(--muted-foreground,var(--muted));font-family:'DM Mono',monospace;font-weight:600}
+@media(max-width:600px){.appearance-controls .segmented-control{grid-template-columns:repeat(2,minmax(0,1fr))}}
