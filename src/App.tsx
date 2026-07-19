@@ -105,11 +105,9 @@ export default function App() {
         flash(`Updated “${cleanName}”.`)
         return
       }
-      setVariants((current) => {
-        const next = createVariant(current, config, cleanName)
-        setActiveVariantId(next[next.length - 1].id)
-        return next
-      })
+      const next = createVariant(variants, config, cleanName)
+      setVariants(next)
+      setActiveVariantId(next[next.length - 1].id)
       setSaveDialogOpen(false)
       flash(`Saved “${cleanName}”.`)
     } catch {
@@ -128,7 +126,7 @@ export default function App() {
   }
 
   const copyVariant = (id: string) => {
-    try { setVariants((current) => duplicateVariant(current, id)); flash("Layout duplicated.") }
+    try { setVariants(duplicateVariant(variants, id)); flash("Layout duplicated.") }
     catch { flash("Three layouts are already saved.") }
   }
 
@@ -151,7 +149,7 @@ export default function App() {
       <Section id="cards" label="Cards"><div className="card-grid"><Card><CardHeader><Badge>New</Badge><CardTitle>Start a project</CardTitle><CardDescription>Set up a new workspace from your preferred baseline.</CardDescription></CardHeader><CardFooter><Button size="sm">Create project</Button></CardFooter></Card><Card><CardHeader><div className="avatar">OF</div><CardTitle>Owen Fisher</CardTitle><CardDescription>Product designer · Vancouver</CardDescription></CardHeader><CardFooter><Button variant="outline" size="sm">View profile</Button></CardFooter></Card><Card><CardHeader><CardTitle>Pro plan</CardTitle><CardDescription>For teams that need more control.</CardDescription><p className="price">$24 <span>/ month</span></p></CardHeader><CardFooter><Button size="sm">Upgrade</Button></CardFooter></Card></div></Section>
       <Section id="data-display" label="Data display"><Specimen title="Table"><div className="table-wrap"><table><thead><tr><th>Project</th><th>Status</th><th>Updated</th><th><span className="sr-only">Actions</span></th></tr></thead><tbody>{[["UI Library", "Active", "Today"], ["Marketing site", "In review", "Yesterday"], ["Mobile app", "Draft", "Jul 12"]].map(([n,s,d]) => <tr key={n}><td><b>{n}</b><small>Design system</small></td><td><Badge className={s === "Active" ? "success" : "neutral"}>{s}</Badge></td><td>{d}</td><td><Button variant="ghost" size="sm" aria-label={`Actions for ${n}`}><MoreHorizontal size={17}/></Button></td></tr>)}</tbody></table></div></Specimen></Section>
       <ExtendedGallery />
-      <Section id="feedback" label="Feedback"><div className="two-col"><Specimen title="Alert"><div className="alert"><CircleHelp size={19}/><div><b>Heads up!</b><p>Your account has been successfully updated.</p></div></div></Specimen><Specimen title="Dropdown"><div className="dropdown-wrap"><Button variant="outline" onClick={() => setOpen(!open)}>Account <ChevronDown size={16}/></Button>{open && <div className="menu"><button><Settings size={15}/> Settings</button><button><CreditCard size={15}/> Billing</button><hr/><button className="danger"><Trash2 size={15}/> Delete account</button></div>}</div></Specimen></div></Section>
+      <Section id="feedback" label="Feedback"><div className="two-col"><Specimen title="Alert"><div className="alert"><CircleHelp size={19}/><div><b>Heads up!</b><p>Your account has been successfully updated.</p></div></div></Specimen><Specimen title="Dropdown"><div className="dropdown-wrap"><Button variant="outline" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen(!open)}>Account <ChevronDown size={16}/></Button>{open && <div className="menu" role="menu"><button role="menuitem" onClick={() => { setOpen(false); flash("Settings selected.") }}><Settings size={15}/> Settings</button><button role="menuitem" onClick={() => { setOpen(false); flash("Billing selected.") }}><CreditCard size={15}/> Billing</button><hr/><button className="danger" role="menuitem" onClick={() => { setOpen(false); flash("Delete account selected.") }}><Trash2 size={15}/> Delete account</button></div>}</div></Specimen></div></Section>
       <footer>Built as a starting point. Replace the palette and type tokens in <code>src/styles.css</code> to make it yours.</footer>
     </main>{notice && <div className="toast" role="status"><Bell size={17}/><span>{notice}</span><button onClick={() => setNotice("")}>Dismiss</button></div>}
     <ThemeCustomizer open={customizerOpen} config={config} previewMode={previewMode} onOpenChange={setCustomizerOpen} onConfigChange={setConfig} onPreviewModeChange={setPreviewMode} onReset={resetTheme} currentStyle={style} onStyleChange={selectStyle} />
