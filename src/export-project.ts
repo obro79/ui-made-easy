@@ -1,6 +1,7 @@
 import { isThemeConfig, spacingScale, themeVariables, type ThemeConfig, type ThemeMode } from "./theme"
 import { getStylePreset } from "./presets"
 import authenticStyles from "./authentic-styles.css?raw"
+import curatedStyles from "./curated-styles.css?raw"
 import JSZip from "jszip"
 
 export type ExportedProjectFile = {
@@ -124,7 +125,8 @@ import { Textarea } from "@/components/ui/textarea"
 
 export function ComponentShowcase() {
   return (
-    <main className="theme-scope theme-showcase" data-style-id="${preset.id}" data-layout="${preset.recipe.layout}" data-surface="${preset.recipe.surface}" data-treatment="${preset.recipe.typography}" data-geometry="${preset.recipe.geometry}" data-decoration="${preset.recipe.decoration}">
+    <div className="theme-scope" data-style-id="${preset.id}" data-layout="${preset.recipe.layout}" data-surface="${preset.recipe.surface}" data-treatment="${preset.recipe.typography}" data-geometry="${preset.recipe.geometry}" data-decoration="${preset.recipe.decoration}">
+    <main className="theme-showcase">
       <header className="theme-showcase-header">
         <Badge>Component showcase</Badge>
         <h1 className="theme-display">A practical UI foundation</h1>
@@ -182,6 +184,7 @@ export function ComponentShowcase() {
         </div>
       </section>
     </main>
+    </div>
   )
 }
 `
@@ -269,7 +272,7 @@ export function generateExportProject(theme: ThemeConfig): ExportedProject {
   assertTheme(theme)
   const files: ExportedProjectFile[] = [
     { path: "src/app/globals.css", content: generateTailwindGlobals(theme), mimeType: "text/css" },
-    { path: "src/app/style-recipe.css", content: authenticStyles, mimeType: "text/css" },
+    { path: "src/app/style-recipe.css", content: `${authenticStyles}\n${curatedStyles}`, mimeType: "text/css" },
     { path: "src/components/ComponentShowcase.tsx", content: generateComponentShowcase(theme), mimeType: "text/tsx" },
     { path: "components.json", content: generateComponentsJson(), mimeType: "application/json" },
     { path: "theme-manifest.json", content: generateThemeManifest(theme), mimeType: "application/json" },

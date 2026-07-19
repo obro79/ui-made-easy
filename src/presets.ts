@@ -7,7 +7,7 @@ const recipe = (typography: StyleRecipe["typography"], geometry: StyleRecipe["ge
 const preset = (id: string, name: string, category: StyleCategory, description: string, tags: string[], seed: `#${string}`, visualRecipe: StyleRecipe, authenticity: StyleAuthenticitySpec): StylePresetDefinition =>
   ({ id, name, category, description, tags, seed, recipe: visualRecipe, authenticity })
 
-export const STYLE_PRESETS = [
+const ALL_STYLE_PRESETS = [
   preset("minimalism", "Minimalism", "product", "Quiet essentials with generous negative space.", ["clean", "quiet", "universal"], "#18181b", recipe("neutral-sans", "subtle", "flat", "comfortable", "document", "none", "soft"), auth(["International modernism", "content-first reduction"], ["few colors", "clear hierarchy", "generous whitespace"], ["empty for its own sake", "low-contrast controls"], ["portfolios", "focused tools", "content products"], "Muted text must remain AA; do not communicate hierarchy with faintness alone.")),
   preset("swiss", "Swiss", "product", "Grid-led typography with objective visual order.", ["grid", "typographic", "modernist"], "#e21d2f", recipe("neutral-sans", "square", "outlined", "default", "grid", "none", "high"), auth(["International Typographic Style", "modular grids"], ["asymmetric grid", "bold sans headings", "red accent"], ["decorative clutter", "soft pill UI"], ["editorial products", "brand systems", "data stories"], "Preserve a logical reading order when the visual grid becomes asymmetric.")),
   preset("editorial", "Editorial", "product", "Publication hierarchy adapted to digital products.", ["serif", "content", "premium"], "#285c4b", recipe("editorial-serif", "subtle", "flat", "comfortable", "document", "none"), auth(["magazine art direction", "newspaper hierarchy"], ["serif display type", "strong scale contrast", "measured columns"], ["generic blog template", "excessive centered copy"], ["publishing", "reports", "storytelling"], "Keep body measure near 45–75 characters and never use display faces for dense UI labels.")),
@@ -17,14 +17,14 @@ export const STYLE_PRESETS = [
   preset("vercel-inspired", "Vercel-inspired", "product", "Monochrome developer UI with crisp geometry.", ["developer", "monochrome", "precise"], "#000000", recipe("neutral-sans", "subtle", "outlined", "default", "dashboard", "none", "high"), auth(["Vercel dashboard patterns", "Swiss restraint"], ["black-white palette", "hairline borders", "precise type"], ["brand-logo imitation", "gray-on-gray ambiguity"], ["developer platforms", "deployments", "infrastructure"], "Use shape, label, or icon in addition to color for deployment states.")),
   preset("stripe-inspired", "Stripe-inspired", "product", "Information-rich commerce UI with luminous accents.", ["fintech", "polished", "data"], "#635bff", recipe("humanist-sans", "rounded", "raised", "default", "dashboard", "mesh"), auth(["Stripe product surfaces", "fintech information design"], ["indigo accent", "layered data cards", "precise tables"], ["marketing gradients inside core tasks", "weak numeric alignment"], ["payments", "fintech", "analytics"], "Numbers require tabular alignment and status colors require redundant labels.")),
   preset("notion-inspired", "Notion-inspired", "product", "Document-first workspace with calm neutral controls.", ["documents", "blocks", "calm"], "#37352f", recipe("neutral-sans", "subtle", "flat", "comfortable", "document", "none", "soft"), auth(["Notion workspace patterns", "block editors"], ["document canvas", "muted toolbar", "lightweight blocks"], ["copying proprietary icons", "invisible block actions"], ["knowledge bases", "notes", "wikis"], "Reveal-on-hover controls must also appear on keyboard focus and touch.")),
-  preset("enterprise-dense", "Enterprise Dense", "product", "High-throughput interfaces for expert operators.", ["enterprise", "dense", "tables"], "#185fa5", recipe("neutral-sans", "subtle", "outlined", "compact", "workspace", "none"), auth(["enterprise information systems", "expert workflows"], ["dense tables", "persistent navigation", "explicit labels"], ["tiny hit targets", "decorative cards around every group"], ["ERP", "CRM", "operations"], "Maintain 44px touch targets where relevant even when visual rows are compact.")),
+  preset("enterprise-dense", "Enterprise Dense", "product", "High-throughput interfaces for expert operators.", ["enterprise", "dense", "tables"], "#185fa5", recipe("neutral-sans", "subtle", "outlined", "compact", "dense", "none"), auth(["enterprise information systems", "expert workflows"], ["dense tables", "persistent navigation", "explicit labels"], ["tiny hit targets", "decorative cards around every group"], ["ERP", "CRM", "operations"], "Maintain 44px touch targets where relevant even when visual rows are compact.")),
 
   preset("bento-grid", "Bento Grid", "layout", "Modular unequal cards organized into a strong grid.", ["grid", "cards", "modular"], "#2563eb", recipe("geometric-sans", "rounded", "raised", "comfortable", "grid", "none"), auth(["Japanese bento composition", "modular dashboards"], ["varied spans", "strong card hierarchy", "aligned gutters"], ["random card sizes", "every card competing equally"], ["dashboards", "landing pages", "feature overviews"], "Responsive reordering must preserve reading and focus order.")),
   preset("card-first", "Card-first", "layout", "Every major object has a clear contained home.", ["cards", "objects", "scannable"], "#0f766e", recipe("neutral-sans", "rounded", "raised", "default", "dashboard", "none"), auth(["object-oriented UI", "modular component systems"], ["clear card anatomy", "repeatable metadata", "consistent actions"], ["nested card soup", "excessive shadows"], ["marketplaces", "project galleries", "content feeds"], "Card titles, actions, and boundaries must remain perceivable at 200% zoom.")),
-  preset("cinematic-mission-control", "Cinematic Mission Control", "layout", "Wide-screen operational overview with dramatic focus.", ["operations", "wide", "cinematic"], "#22d3ee", recipe("geometric-sans", "subtle", "layered", "compact", "dashboard", "glow", "high"), auth(["broadcast control rooms", "situational-awareness displays"], ["panoramic layout", "hero metrics", "dark layered panels"], ["movie-prop illegibility", "constant motion"], ["NOC dashboards", "live events", "monitoring"], "Motion must respect reduced-motion and critical alerts cannot depend on glow.")),
+  preset("cinematic-mission-control", "Cinematic Mission Control", "layout", "Wide-screen operational overview with dramatic focus.", ["operations", "wide", "cinematic"], "#22d3ee", recipe("geometric-sans", "subtle", "layered", "compact", "mission-control", "glow", "high"), auth(["broadcast control rooms", "situational-awareness displays"], ["panoramic layout", "hero metrics", "dark layered panels"], ["movie-prop illegibility", "constant motion"], ["NOC dashboards", "live events", "monitoring"], "Motion must respect reduced-motion and critical alerts cannot depend on glow.")),
   preset("canvas", "Canvas", "layout", "Open work surface where content becomes spatial objects.", ["canvas", "creative", "freeform"], "#7c3aed", recipe("neutral-sans", "rounded", "canvas", "default", "canvas", "grid"), auth(["whiteboards", "creative canvases"], ["infinite-feeling surface", "floating tools", "object selection"], ["unbounded keyboard traps", "controls without coordinates"], ["whiteboards", "diagramming", "design tools"], "Provide keyboard pan/zoom, visible selection, and an accessible object outline.")),
-  preset("node-based", "Node-based", "layout", "Connected blocks for visual systems and flows.", ["nodes", "flows", "technical"], "#8b5cf6", recipe("mono", "subtle", "outlined", "compact", "canvas", "grid"), auth(["visual programming", "graph editors"], ["ports and edges", "typed nodes", "minimap/navigation"], ["crossing-edge chaos", "color-only port types"], ["automation", "data pipelines", "AI workflows"], "Expose graph structure and connections in a navigable nonvisual representation.")),
-  preset("split-pane-workspace", "Split-pane Workspace", "layout", "Resizable simultaneous contexts for expert work.", ["workspace", "panes", "productivity"], "#475569", recipe("neutral-sans", "square", "outlined", "compact", "workspace", "none"), auth(["IDEs", "professional desktop software"], ["persistent panes", "draggable dividers", "contextual toolbars"], ["too many default panes", "unlabeled icon rails"], ["editors", "analytics", "support consoles"], "Dividers need keyboard resizing and panes need landmarks and names.")),
+  preset("node-based", "Node-based", "layout", "Connected blocks for visual systems and flows.", ["nodes", "flows", "technical"], "#8b5cf6", recipe("mono", "subtle", "outlined", "compact", "nodes", "grid"), auth(["visual programming", "graph editors"], ["ports and edges", "typed nodes", "minimap/navigation"], ["crossing-edge chaos", "color-only port types"], ["automation", "data pipelines", "AI workflows"], "Expose graph structure and connections in a navigable nonvisual representation.")),
+  preset("split-pane-workspace", "Split-pane Workspace", "layout", "Resizable simultaneous contexts for expert work.", ["workspace", "panes", "productivity"], "#475569", recipe("neutral-sans", "square", "outlined", "compact", "split-pane", "none"), auth(["IDEs", "professional desktop software"], ["persistent panes", "draggable dividers", "contextual toolbars"], ["too many default panes", "unlabeled icon rails"], ["editors", "analytics", "support consoles"], "Dividers need keyboard resizing and panes need landmarks and names.")),
   preset("command-centered", "Command-centered", "layout", "Search and commands lead navigation and action.", ["command", "keyboard", "search"], "#4f46e5", recipe("mono", "subtle", "layered", "compact", "workspace", "none"), auth(["command palettes", "keyboard-driven tools"], ["prominent command input", "shortcut hints", "action history"], ["keyboard-only functionality", "opaque command names"], ["developer tools", "power-user apps", "launchers"], "Every command needs a discoverable pointer/touch path and descriptive text.")),
   preset("timeline", "Timeline", "layout", "Chronology is the primary organizing structure.", ["time", "history", "events"], "#db2777", recipe("humanist-sans", "rounded", "flat", "default", "timeline", "none"), auth(["historical timelines", "activity streams"], ["strong time axis", "grouped events", "clear current point"], ["zigzag decoration", "ambiguous sequence"], ["roadmaps", "audit logs", "project history"], "DOM order must match chronology; dates require machine-readable semantics.")),
   preset("spatial-layering", "Spatial Layering", "layout", "Depth and overlap communicate hierarchy and context.", ["depth", "layers", "immersive"], "#0891b2", recipe("geometric-sans", "organic", "layered", "comfortable", "spatial", "mesh"), auth(["spatial interfaces", "depth-based information design"], ["intentional overlap", "depth cues", "foreground tools"], ["occluded content", "depth conveyed only by blur"], ["maps", "media tools", "immersive dashboards"], "All overlapped content needs reachable focus and sufficient contrast against changing layers.")),
@@ -54,7 +54,18 @@ export const STYLE_PRESETS = [
   preset("primer-inspired", "Primer-inspired", "system-reference", "Developer-focused clarity inspired by Primer.", ["system", "developer", "practical"], "#0969da", recipe("neutral-sans", "subtle", "outlined", "compact", "workspace", "none"), auth(["Primer public design guidance", "GitHub workflow patterns"], ["practical controls", "clear states", "compact data lists"], ["claiming official compliance", "copying proprietary product chrome"], ["developer platforms", "code review", "project management"], "Status colors need icons/text and keyboard interaction must support dense lists.")),
 ] as const satisfies readonly StylePresetDefinition[]
 
-export type StylePresetId = (typeof STYLE_PRESETS)[number]["id"]
+/** The 20 styles currently held to the visual QA bar. Retired recipes stay
+ * available above as migration source material while we refine them later. */
+export const CURATED_STYLE_IDS = [
+  "minimalism", "swiss", "editorial", "saas-modern", "linear-inspired", "enterprise-dense",
+  "bento-grid", "cinematic-mission-control", "canvas", "node-based", "split-pane-workspace", "timeline",
+  "liquid-glass", "aurora-mesh", "monochrome-dark", "neo-brutalism", "collage-scrapbook",
+  "retrofuturism", "terminal", "material-3-inspired",
+] as const
+
+export type StylePresetId = (typeof CURATED_STYLE_IDS)[number]
+const allById = new Map<string, StylePresetDefinition>(ALL_STYLE_PRESETS.map((item) => [item.id, item]))
+export const STYLE_PRESETS = CURATED_STYLE_IDS.map((id) => allById.get(id)!)
 export const STYLE_PRESET_COUNT = STYLE_PRESETS.length
 export const STYLE_PRESET_IDS = STYLE_PRESETS.map((item) => item.id) as StylePresetId[]
 
@@ -63,18 +74,28 @@ const byName = new Map<string, StylePresetDefinition>(STYLE_PRESETS.map((item) =
 
 /** Maps the former 24-preset names to their closest canonical style. */
 export const LEGACY_PRESET_MAP: Readonly<Record<string, StylePresetId>> = {
-  Editorial: "editorial", Minimal: "minimalism", Brutalist: "neo-brutalism", "Soft UI": "soft-spatial",
-  Glass: "glassmorphism", Bento: "bento-grid", "Neo-grotesk": "swiss", Warm: "tactile-maximalism",
-  Midnight: "monochrome-dark", Playful: "maximalism", Swiss: "swiss", Corporate: "enterprise-dense",
-  Luxury: "editorial", Cyberpunk: "retrofuturism", Pastel: "soft-spatial", Material: "material-3-inspired",
-  Retro: "retrofuturism", Terminal: "terminal", Scandinavian: "minimalism", Bauhaus: "asymmetric-modular",
-  Japanese: "editorial", Y2K: "retrofuturism", Industrial: "industrial", Organic: "soft-spatial",
+  Editorial: "editorial", Minimal: "minimalism", Brutalist: "neo-brutalism", "Soft UI": "liquid-glass",
+  Glass: "liquid-glass", Bento: "bento-grid", "Neo-grotesk": "swiss", Warm: "collage-scrapbook",
+  Midnight: "monochrome-dark", Playful: "collage-scrapbook", Swiss: "swiss", Corporate: "enterprise-dense",
+  Luxury: "editorial", Cyberpunk: "retrofuturism", Pastel: "saas-modern", Material: "material-3-inspired",
+  Retro: "retrofuturism", Terminal: "terminal", Scandinavian: "minimalism", Bauhaus: "swiss",
+  Japanese: "editorial", Y2K: "retrofuturism", Industrial: "terminal", Organic: "liquid-glass",
+}
+
+export const RETIRED_PRESET_MAP: Readonly<Record<string, StylePresetId>> = {
+  "functional-minimalism": "minimalism", "vercel-inspired": "monochrome-dark",
+  "stripe-inspired": "saas-modern", "notion-inspired": "minimalism", "card-first": "bento-grid",
+  "command-centered": "terminal", "spatial-layering": "liquid-glass", "asymmetric-modular": "swiss",
+  glassmorphism: "liquid-glass", "soft-spatial": "liquid-glass", glow: "cinematic-mission-control",
+  "gradient-border": "aurora-mesh", "high-contrast-dark": "monochrome-dark", maximalism: "collage-scrapbook",
+  "tactile-maximalism": "collage-scrapbook", "hand-drawn": "collage-scrapbook", industrial: "terminal",
+  "fluent-2-inspired": "enterprise-dense", "carbon-inspired": "enterprise-dense", "primer-inspired": "linear-inspired",
 }
 
 export function getStylePreset(idOrName: string): StylePresetDefinition | undefined {
   const direct = byId.get(idOrName) ?? byName.get(idOrName.toLowerCase())
   if (direct) return direct
-  const legacyId = LEGACY_PRESET_MAP[idOrName]
+  const legacyId = LEGACY_PRESET_MAP[idOrName] ?? RETIRED_PRESET_MAP[idOrName]
   return legacyId ? byId.get(legacyId) : undefined
 }
 

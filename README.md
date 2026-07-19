@@ -5,7 +5,7 @@ A visual UI-system laboratory for exploring, tuning, comparing, saving, and expo
 ## What it does
 
 - Presents buttons, typography, forms, cards, tables, navigation, overlays, loading states, feedback, and other common UI primitives together.
-- Includes exactly 40 curated styles across product, layout, effects, expressive, and design-system-inspired categories.
+- Includes 20 curated styles across product, layout, effects, expressive, and design-system-inspired categories.
 - Gives every style a documented reference basis, signature traits, misuse warnings, intended uses, and accessibility adaptations.
 - Changes composition, typography, density, geometry, surfaces, decoration, and motion through shared role tokens.
 - Saves named presets locally and compares up to three directions side by side.
@@ -15,11 +15,11 @@ A visual UI-system laboratory for exploring, tuning, comparing, saving, and expo
 
 | Category | Presets |
 | --- | --- |
-| Product | Minimalism, Swiss, Editorial, Functional Minimalism, SaaS Modern, Linear-inspired, Vercel-inspired, Stripe-inspired, Notion-inspired, Enterprise Dense |
-| Layout | Bento Grid, Card-first, Cinematic Mission Control, Canvas, Node-based, Split-pane Workspace, Command-centered, Timeline, Spatial Layering, Asymmetric Modular |
-| Effects & dark | Glassmorphism, Liquid Glass, Soft Spatial, Aurora/Mesh, Glow, Gradient Border, Monochrome Dark, High-contrast Dark |
-| Expressive & era | Neo-brutalism, Maximalism, Tactile Maximalism, Collage/Scrapbook, Hand-drawn, Retrofuturism, Terminal, Industrial |
-| System references | Material 3-inspired, Fluent 2-inspired, Carbon-inspired, Primer-inspired |
+| Product | Minimalism, Swiss, Editorial, SaaS Modern, Linear-inspired, Enterprise Dense |
+| Layout | Bento Grid, Cinematic Mission Control, Canvas, Node-based, Split-pane Workspace, Timeline |
+| Effects & dark | Liquid Glass, Aurora/Mesh, Monochrome Dark |
+| Expressive & era | Neo-brutalism, Collage/Scrapbook, Retrofuturism, Terminal |
+| System references | Material 3-inspired |
 
 Named product and design-system styles are clearly labeled as inspired interpretations, not official implementations.
 
@@ -38,7 +38,7 @@ Open the local URL printed by Vite.
 
 ```bash
 npm run dev          # Start the local workbench
-npm run test:styles  # Verify the 40-preset registry and CSS signatures
+npm run test:styles  # Verify the 20-preset registry and CSS signatures
 npm run build        # Type-check and create a production build
 npm run preview      # Preview the production build
 ```

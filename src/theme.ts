@@ -180,7 +180,7 @@ const recipeStyle = (preset: (typeof STYLE_PRESETS)[number]): PresetStyle => {
   return { ...DEFAULT_STYLE, ...typographyStyle(recipe.typography), density, baseSpacing: recipe.density === "spacious" ? 6 : recipe.density === "compact" ? 3 : 4, radius,
     shadow: recipe.surface === "flat" || recipe.surface === "outlined" ? "none" : recipe.surface === "raised" || recipe.surface === "layered" ? "medium" : "soft",
     borderWidth: recipe.geometry === "square" && recipe.contrast === "high" ? 2 : recipe.surface === "flat" ? 0 : 1,
-    contentWidth: recipe.layout === "document" ? "narrow" : recipe.layout === "workspace" || recipe.layout === "canvas" || recipe.layout === "asymmetric" ? "wide" : "standard" }
+    contentWidth: recipe.layout === "document" ? "narrow" : ["workspace", "dense", "mission-control", "canvas", "nodes", "split-pane", "asymmetric"].includes(recipe.layout) ? "wide" : "standard" }
 }
 
 export function createThemeFromPreset(preset = "minimalism"): ThemeConfig {

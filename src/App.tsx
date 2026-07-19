@@ -16,14 +16,16 @@ import "./style-presets-extra.css"
 import "./customization-overrides.css"
 import "./save-preset.css"
 import "./authentic-styles.css"
+import "./curated-styles.css"
 
 const sections = ["Foundations", "Buttons", "Typography", "Forms", "Cards", "Data display", "Navigation", "Overlays", "States", "Feedback"]
+const DARK_FIRST_STYLES = new Set(["linear-inspired", "cinematic-mission-control", "monochrome-dark", "retrofuturism", "terminal"])
 function Section({ id, label, children }: { id: string, label: string, children: React.ReactNode }) { return <section id={id} className="spec-section"><div className="section-heading"><p className="eyebrow">{label}</p><h2>{label}</h2></div>{children}</section> }
 function Specimen({ title, children }: { title: string, children: React.ReactNode }) { return <div className="specimen"><div className="specimen-bar"><span>{title}</span><Copy size={14} /></div><div className="specimen-content">{children}</div></div> }
 
 export default function App() {
   const [config, setConfig] = useState(loadTheme)
-  const [previewMode, setPreviewMode] = useState<ThemeMode>("light")
+  const [previewMode, setPreviewMode] = useState<ThemeMode>(() => DARK_FIRST_STYLES.has(resolveStylePresetId(config.preset)) ? "dark" : "light")
   const [customizerOpen, setCustomizerOpen] = useState(false)
   const [notice, setNotice] = useState("")
   const [open, setOpen] = useState(false)
@@ -67,6 +69,7 @@ export default function App() {
     setUndoConfig(structuredClone(config))
     setStyle(nextId)
     setConfig(createThemeFromPreset(nextId))
+    setPreviewMode(DARK_FIRST_STYLES.has(nextId) ? "dark" : "light")
     flash(`Applied ${getStylePreset(nextId)?.name}.`)
   }
 
@@ -139,7 +142,7 @@ export default function App() {
 
   return <div ref={rootRef} className={`app theme-scope ${previewMode === "dark" ? "dark" : ""}`} data-style-id={style} data-layout={activePreset.recipe.layout} data-surface={activePreset.recipe.surface} data-treatment={activePreset.recipe.typography} data-geometry={activePreset.recipe.geometry} data-decoration={activePreset.recipe.decoration} data-motion={motion}>
     <aside><a className="brand" href="#top"><span>UI</span> Library</a><p className="side-label">Foundations</p>{sections.map((s) => <a key={s} href={`#${s.toLowerCase().replace(" ", "-")}`}>{s}</a>)}<div className="sidebar-bottom"><button className="theme-toggle" onClick={() => setPreviewMode(previewMode === "dark" ? "light" : "dark")}><span className="theme-dot" />{previewMode === "dark" ? "Dark theme" : "Light theme"}</button><p>v0.2 · theme editor</p></div></aside>
-    <main id="top"><header><div><p className="eyebrow">Design system workbench</p><h1>Your UI, all in one place.</h1><p className="lede">Create, save, and compare up to three complete visual directions.</p></div><div className="header-actions"><Button variant="outline" onClick={() => setCustomizerOpen(true)}><Palette size={16}/>{activePreset.name}</Button><CustomizeTrigger onClick={() => setCustomizerOpen(true)} />{undoConfig && <Button variant="ghost" onClick={undoStyle}><Undo2 size={16}/>Undo style</Button>}<Button variant="outline" onClick={requestSavePreset}><Save size={16}/>{activeVariantId ? "Update preset" : "Save preset"}</Button><Button onClick={() => setComparisonOpen(true)}><Columns3 size={16}/> Compare {variants.length}/3</Button></div></header>
+    <main id="top"><header className="page-hero"><div className="hero-copy"><p className="eyebrow">Design system workbench</p><h1>Your UI, all in one place.</h1><p className="lede">Create, save, and compare up to three complete visual directions.</p></div><div className="header-actions hero-toolbar"><Button variant="outline" onClick={() => setCustomizerOpen(true)}><Palette size={16}/>{activePreset.name}</Button><CustomizeTrigger onClick={() => setCustomizerOpen(true)} />{undoConfig && <Button variant="ghost" onClick={undoStyle}><Undo2 size={16}/>Undo style</Button>}<Button variant="outline" onClick={requestSavePreset}><Save size={16}/>{activeVariantId ? "Update preset" : "Save preset"}</Button><Button onClick={() => setComparisonOpen(true)}><Columns3 size={16}/> Compare {variants.length}/3</Button></div></header>
       <StyleDnaPanel preset={activePreset} />
       <Section id="foundations" label="Foundations"><div className="foundation-grid"><Specimen title="Color"><div className="swatches"><i className="swatch primary"/><i className="swatch ink"/><i className="swatch muted"/><i className="swatch surface"/><i className="swatch danger"/></div></Specimen><Specimen title="Spacing"><div className="spacing"><b style={{width:8}}/><b style={{width:16}}/><b style={{width:24}}/><b style={{width:32}}/><b style={{width:48}}/></div></Specimen><Specimen title="Elevation"><div className="elevation"><span>Subtle</span><span>Raised</span><span>Floating</span></div></Specimen></div></Section>
       <Section id="buttons" label="Buttons"><Specimen title="Variants"><div className="row wrap"><Button>Primary action</Button><Button variant="secondary">Secondary</Button><Button variant="outline">Outline</Button><Button variant="ghost">Ghost</Button><Button variant="destructive">Delete</Button><Button disabled>Disabled</Button></div></Specimen><Specimen title="Sizes & icons"><div className="row"><Button size="sm">Small</Button><Button>Default</Button><Button size="lg">Large <Plus size={16}/></Button><Button variant="outline" aria-label="More options"><MoreHorizontal size={18}/></Button></div></Specimen></Section>

@@ -91,6 +91,12 @@ export function StyleSelector({
                 aria-selected={selected}
                 className="style-selector-card"
                 data-selected={selected || undefined}
+                data-style-id={style.id}
+                data-layout={style.recipe.layout}
+                data-surface={style.recipe.surface}
+                data-treatment={style.recipe.typography}
+                data-geometry={style.recipe.geometry}
+                data-decoration={style.recipe.decoration}
                 style={variablesFor(style.id, mode)}
                 onClick={() => onChange(style.id)}
               >

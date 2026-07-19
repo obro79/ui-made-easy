@@ -136,11 +136,11 @@
 .theme-scope[data-treatment="display"] :is(h1,h2) { font-weight: 900; letter-spacing: -.065em; }
 .theme-scope[data-treatment="geometric-sans"] :is(h1,h2) { letter-spacing: -.05em; }
 .theme-scope[data-treatment="humanist-sans"] { letter-spacing: .002em; }
-.theme-scope[data-treatment="square"] :is(.specimen,.card,.button,input,select,.badge) { border-radius: 0; }
-.theme-scope[data-treatment="rounded"] :is(.specimen,.card) { border-radius: max(14px,var(--radius-lg)); }
-.theme-scope[data-treatment="pill"] :is(.button,.badge,input,select) { border-radius: 999px; }
-.theme-scope[data-treatment="mixed"] :is(.card,.specimen):nth-child(odd) { border-radius: 2px 24px; }
-.theme-scope[data-treatment="organic"] :is(.card,.specimen) { border-radius: 28px 10px 25px 14px; }
+.theme-scope[data-geometry="square"] :is(.specimen,.card,.button,input,select,.badge) { border-radius: 0; }
+.theme-scope[data-geometry="rounded"] :is(.specimen,.card) { border-radius: max(14px,var(--radius-lg)); }
+.theme-scope[data-geometry="pill"] :is(.button,.badge,input,select) { border-radius: 999px; }
+.theme-scope[data-geometry="mixed"] :is(.card,.specimen):nth-child(odd) { border-radius: 2px 24px; }
+.theme-scope[data-geometry="organic"] :is(.card,.specimen) { border-radius: 28px 10px 25px 14px; }
 
 /* Exact canonical registry IDs from presets.ts. */
 .theme-scope[data-style-id="minimalism"] .specimen-bar { border-bottom-color: transparent; }

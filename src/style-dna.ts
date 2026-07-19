@@ -3,7 +3,7 @@ export type TypographyRecipe = "neutral-sans" | "editorial-serif" | "geometric-s
 export type GeometryRecipe = "square" | "subtle" | "rounded" | "pill" | "mixed" | "organic"
 export type SurfaceRecipe = "flat" | "outlined" | "raised" | "glass" | "soft" | "layered" | "canvas"
 export type DensityRecipe = "compact" | "default" | "comfortable" | "spacious"
-export type LayoutRecipe = "document" | "dashboard" | "grid" | "workspace" | "canvas" | "timeline" | "spatial" | "asymmetric"
+export type LayoutRecipe = "document" | "dashboard" | "dense" | "grid" | "workspace" | "mission-control" | "canvas" | "nodes" | "split-pane" | "timeline" | "spatial" | "asymmetric"
 export type DecorationRecipe = "none" | "grid" | "mesh" | "glow" | "gradient-border" | "texture" | "hand-drawn" | "chrome"
 
 export type StyleRecipe = {
